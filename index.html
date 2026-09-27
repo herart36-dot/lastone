@@ -198,6 +198,43 @@
             outline: none;
             border-color: #FF0055;
         }
+        /* ---- INTERACTIVE / AESTHETIC LAYER ---- */
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 420px; height: 420px;
+            border-radius: 9999px;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle, rgba(255,0,85,0.14) 0%, rgba(112,0,255,0.08) 45%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+        html.has-fine-pointer #cursor-glow { opacity: 1; }
+        .tilt-card { transition: transform 0.25s ease, box-shadow 0.25s ease; transform-style: preserve-3d; will-change: transform; }
+        .tilt-shine {
+            position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+            background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.5), transparent 60%);
+            opacity: 0; transition: opacity 0.3s ease; mix-blend-mode: overlay;
+        }
+        .tilt-card:hover .tilt-shine { opacity: 1; }
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s cubic-bezier(.2,.8,.2,1), transform 0.6s cubic-bezier(.2,.8,.2,1); }
+        .reveal.is-visible { opacity: 1; transform: translateY(0); }
+        body.dark-mode { background-color: #0D0D0D; color: #FAF8F5; }
+        body.dark-mode .bg-white { background-color: #17171A !important; color: #FAF8F5; }
+        body.dark-mode .bg-editorial-cream { background-color: #17171A !important; }
+        body.dark-mode .bg-editorial-cream\/40 { background-color: rgba(23,23,26,0.6) !important; }
+        body.dark-mode .text-editorial-black { color: #FAF8F5 !important; }
+        body.dark-mode .border-editorial-border { border-color: #3a3a3f !important; }
+        body.dark-mode .text-editorial-gray { color: #9a9894 !important; }
+        body.dark-mode header#main-header { background-color: #0D0D0D; }
+        body.dark-mode .shadow-neo, body.dark-mode .shadow-neo-lg { box-shadow: 4px 4px 0px 0px #FF0055; }
+        #dark-toggle { transition: transform 0.3s ease, background-color 0.3s ease; }
+        #dark-toggle:hover { transform: rotate(20deg); }
+        #dark-toggle .fa-sun { display: none; }
+        body.dark-mode #dark-toggle .fa-sun { display: inline-block; }
+        body.dark-mode #dark-toggle .fa-moon { display: none; }
     </style>
 
     <script type="application/ld+json" id="ust-graffiti-article-schema">
@@ -215,6 +252,7 @@
     </script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-editorial-pink selection:text-white">
+    <div id="cursor-glow"></div>
 
     <!-- INFINITE TREND TICKER -->
     <div class="bg-editorial-black text-white border-b-2 border-editorial-border overflow-hidden py-2 font-mono text-[11px] uppercase tracking-wider select-none relative group">
@@ -231,6 +269,9 @@
                 <span class="hidden sm:inline-block tracking-wider">GLOBAL DIGITAL EDITION</span>
             </div>
             <div class="flex items-center gap-3 sm:gap-5">
+                <button id="dark-toggle" onclick="toggleDarkMode()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer flex items-center gap-1.5" title="Toggle dark mode">
+                    <i class="fa-solid fa-moon text-xs"></i><i class="fa-solid fa-sun text-xs"></i>
+                </button>
                 <button onclick="surpriseMe()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer items-center gap-1.5 hidden sm:flex" title="Open a random inquiry">
                     <i class="fa-solid fa-dice text-xs"></i> <span>SURPRISE ME</span>
                 </button>
@@ -682,7 +723,55 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             renderEditorPick();
             renderCuriosityRadar();
             renderTicker();
+            initInteractiveLayer();
         };
+
+        // ---- INTERACTIVE / AESTHETIC LAYER ----
+        window.toggleDarkMode = function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('obw_dark', document.body.classList.contains('dark-mode') ? '1' : '0');
+        };
+
+        window.initInteractiveLayer = function() {
+            // scroll-reveal
+            const revealEls = document.querySelectorAll('.reveal:not(.is-visible)');
+            if (window.revealObserver) revealEls.forEach(el => window.revealObserver.observe(el));
+
+            // 3D tilt (re-bind on freshly rendered cards)
+            document.querySelectorAll('.tilt-card:not([data-tilt-bound])').forEach(card => {
+                card.setAttribute('data-tilt-bound', '1');
+                card.addEventListener('mousemove', (e) => {
+                    const r = card.getBoundingClientRect();
+                    const x = e.clientX - r.left, y = e.clientY - r.top;
+                    const rx = ((y / r.height) - 0.5) * -6;
+                    const ry = ((x / r.width) - 0.5) * 6;
+                    card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+                    card.style.setProperty('--mx', x + 'px');
+                    card.style.setProperty('--my', y + 'px');
+                });
+                card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+            });
+        };
+
+        window.revealObserver = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    window.revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 }) : null;
+
+        (function() {
+            const isFine = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+            if (isFine) {
+                document.documentElement.classList.add('has-fine-pointer');
+                window.addEventListener('mousemove', (e) => {
+                    const glow = document.getElementById('cursor-glow');
+                    if (glow) { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; }
+                });
+            }
+        })();
 
         window.renderCategoryTabs = function() {
             const container = document.getElementById('category-tabs-container');
@@ -726,7 +815,8 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             const hero = window.articles.find(a => a.isHero) || window.articles[0];
             
             container.innerHTML = `
-                <div class="bg-white border-3 sm:border-4 border-editorial-border p-5 sm:p-8 shadow-neo-lg rounded-2xl relative overflow-hidden group">
+                <div class="tilt-card reveal bg-white border-3 sm:border-4 border-editorial-border p-5 sm:p-8 shadow-neo-lg rounded-2xl relative overflow-hidden group">
+                    <div class="tilt-shine"></div>
                     <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
                         <button onclick="toggleSaveArticle('${hero.id}')" class="bg-white/90 hover:bg-editorial-pink hover:text-white p-2.5 rounded-full border-2 border-editorial-border transition-all shadow-neo cursor-pointer">
                             <i class="fa-bookmark ${window.savedArticleIds.includes(hero.id) ? 'fa-solid text-editorial-pink' : 'fa-regular'}"></i>
@@ -763,7 +853,8 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
 
         window.renderArticleCardHTML = function(art) {
             return `
-                <div class="bg-white border-3 border-editorial-border p-5 shadow-neo rounded-2xl flex flex-col justify-between space-y-4 relative group hover:-translate-y-1 transition-all">
+                <div class="tilt-card reveal bg-white border-3 border-editorial-border p-5 shadow-neo rounded-2xl flex flex-col justify-between space-y-4 relative group hover:-translate-y-1 hover:shadow-neo-lg transition-all">
+                    <div class="tilt-shine"></div>
                     <div class="space-y-3">
                         <div class="overflow-hidden rounded-xl border-2 border-editorial-border h-48 cursor-pointer bg-white flex items-center justify-center" onclick="openArticleReader('${art.id}')">
                             <img src="${art.image}" alt="${art.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -1205,6 +1296,7 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
         window.addEventListener('hashchange', handleRouteFromHash);
 
         window.onload = function() {
+            if (localStorage.getItem('obw_dark') === '1') document.body.classList.add('dark-mode');
             renderApp();
             document.getElementById('saved-count').innerText = window.savedArticleIds.length;
             if (localStorage.getItem('obw_subscribed')) {

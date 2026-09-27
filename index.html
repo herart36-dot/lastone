@@ -60,11 +60,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
-        .solid-modal {
-            background-color: rgba(13, 13, 13, 0.96) !important;
-        }
-        
-        /* Custom Scrollbars */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -77,13 +72,11 @@
             border-radius: 9999px;
         }
 
-        /* Mobile Touch Scrolling Smoothness */
         .touch-scroll {
             -webkit-overflow-scrolling: touch;
             touch-action: pan-x;
         }
 
-        /* Scroll Interactivity Transitions */
         header {
             transition: padding 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -106,7 +99,6 @@
             display: none !important;
         }
 
-        /* Infinite Marquee Animation */
         @keyframes marquee {
             0% { transform: translateX(0%); }
             100% { transform: translateX(-50%); }
@@ -120,7 +112,6 @@
             animation-play-state: paused;
         }
 
-        /* Pulse Glow Animation */
         @keyframes pulse-glow {
             0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(255,0,85,0.8)); }
             50% { transform: scale(1.2); filter: drop-shadow(0 0 14px rgba(255,0,85,1)); }
@@ -129,24 +120,12 @@
             animation: pulse-glow 2s infinite ease-in-out;
         }
 
-        /* Sticker Tilt Effect */
         .sticker-badge {
             transform: rotate(-2deg);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .sticker-badge:hover {
             transform: rotate(0deg) scale(1.04);
-        }
-
-        /* Visual Inline Edit Highlights */
-        .inline-editable-active {
-            outline: 2px dashed #FF0055 !important;
-            outline-offset: 4px;
-            cursor: pointer !important;
-            position: relative;
-        }
-        .inline-editable-active:hover {
-            background-color: rgba(255, 0, 85, 0.08) !important;
         }
     </style>
 </head>
@@ -163,11 +142,11 @@
         <!-- TOP UTILITY STRIP -->
         <div class="border-b border-editorial-border/20 px-4 py-1.5 text-[11px] font-mono flex justify-between items-center text-editorial-gray">
             <div class="flex items-center gap-4">
-                <span class="font-bold text-editorial-black flex items-center gap-1.5 editable-element" data-key="volIssue">
+                <span class="font-bold text-editorial-black flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-editorial-pink inline-block"></span> <span id="site-vol-issue">VOL. 26 • ISSUE 09</span>
                 </span>
                 <span class="hidden sm:inline-block text-editorial-border/40">•</span>
-                <span class="hidden sm:inline-block tracking-wider editable-element" data-key="edition" id="site-edition">GLOBAL DIGITAL EDITION</span>
+                <span class="hidden sm:inline-block tracking-wider" id="site-edition">GLOBAL DIGITAL EDITION</span>
             </div>
             <div class="flex items-center gap-3 sm:gap-5">
                 <button onclick="openSearchModal()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer flex items-center gap-1.5">
@@ -183,7 +162,7 @@
         <!-- MAIN BRAND HEADER -->
         <div class="brand-header-container py-3 sm:py-5 text-center px-4 bg-editorial-cream/40 relative">
             <div class="max-w-7xl mx-auto flex flex-col items-center">
-                <div onclick="triggerCuriosityEngine();" class="group cursor-pointer select-none inline-block relative editable-element" data-key="brandHeader">
+                <div onclick="triggerCuriosityEngine();" class="group cursor-pointer select-none inline-block relative">
                     <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-none flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-3 transition-all duration-300">
                         <span id="site-brand-part1" class="text-editorial-black group-hover:text-editorial-pink transition-colors">OKAY,</span>
                         <span id="site-brand-part2" class="text-editorial-pink italic font-brand relative inline-block group-hover:scale-105 transition-transform duration-300">
@@ -192,7 +171,7 @@
                         </span>
                     </h1>
                 </div>
-                <p class="font-mono text-[11px] sm:text-xs tracking-widest text-editorial-gray uppercase mt-2 font-semibold flex items-center gap-2 editable-element" data-key="tagline">
+                <p class="font-mono text-[11px] sm:text-xs tracking-widest text-editorial-gray uppercase mt-2 font-semibold flex items-center gap-2">
                     <span class="h-px w-5 bg-editorial-pink"></span>
                     <span id="site-tagline">THE DEEP-DIVE JOURNAL INTO MODERN PHENOMENA</span>
                     <span class="h-px w-5 bg-editorial-pink"></span>
@@ -200,7 +179,7 @@
             </div>
         </div>
 
-        <!-- CATEGORY NAVIGATION TABS (TOUCH SCROLL OPTIMIZED) -->
+        <!-- CATEGORY NAVIGATION TABS -->
         <nav class="border-t-2 border-editorial-border bg-white overflow-x-auto custom-scrollbar touch-scroll">
             <div id="category-tabs-container" class="max-w-7xl mx-auto flex justify-start sm:justify-center min-w-max px-3 sm:px-4 py-2 gap-1.5 sm:gap-2 text-xs font-mono font-bold uppercase">
                 <!-- Dynamically rendered via renderCategoryTabs() -->
@@ -220,7 +199,7 @@
                         <i class="fa-solid fa-fire text-editorial-lime animate-bounce"></i> TODAY'S BURNING QUESTION
                     </div>
                     <h2 class="font-brand text-lg sm:text-2xl lg:text-3xl font-extrabold text-white leading-tight" id="curiosity-question">
-                        "Why are luxury fashion houses reviving 90s minimalism in an era of digital chaos?"
+                        "Strict Professor or Just on a Power Trip?"
                     </h2>
                 </div>
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto shrink-0">
@@ -264,7 +243,7 @@
                 </div>
             </div>
 
-            <!-- RIGHT SIDEBAR: EDITOR'S PICK, RADAR, DIGEST, & MANIFESTO -->
+            <!-- RIGHT SIDEBAR -->
             <aside class="lg:col-span-4 space-y-8">
                 <!-- EDITOR SELECTION CONTAINER -->
                 <div id="editor-pick-container">
@@ -282,16 +261,14 @@
                     <div class="space-y-2">
                         <span class="text-[10px] font-mono font-bold text-editorial-pink uppercase tracking-widest">LIVE PULSE POLL</span>
                         <h4 id="radar-question-text" class="font-brand text-lg font-bold leading-snug text-white">
-                            "Is AI-generated haute couture genuine art or glorified digital plagiarism?"
+                            "Is rigorous academic strictness genuine education or performative power?"
                         </h4>
                     </div>
 
-                    <!-- VOTING INTERACTIVE BUTTONS & PROGRESS BARS -->
                     <div class="space-y-3 pt-1" id="radar-voting-container">
                         <!-- Dynamically rendered via renderCuriosityRadar() -->
                     </div>
 
-                    <!-- READER PROMPT SUBMISSION FORM -->
                     <div class="pt-3 border-t border-gray-800 space-y-2">
                         <label class="block text-[10px] font-mono font-bold uppercase text-gray-400">
                             <i class="fa-solid fa-paper-plane text-editorial-lime mr-1"></i> SUBMIT YOUR OWN "WHY?" PROMPT
@@ -305,7 +282,7 @@
                     </div>
                 </div>
 
-                <!-- WEEKLY DIGEST NEWSLETTER & SUBSCRIBER SYSTEM -->
+                <!-- WEEKLY DIGEST NEWSLETTER -->
                 <div class="bg-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full sticker-badge">
@@ -365,7 +342,7 @@
                     <li><a href="#" onclick="filterCategory('ALL')" class="hover:text-editorial-pink transition-colors">All Inquiries</a></li>
                     <li><a href="#" onclick="filterCategory('FASHION')" class="hover:text-editorial-pink transition-colors">Fashion & Archives</a></li>
                     <li><a href="#" onclick="filterCategory('LIFESTYLE')" class="hover:text-editorial-pink transition-colors">Modern Lifestyle</a></li>
-                    <li><a href="#" onclick="filterCategory('SOCIETAL')" class="hover:text-editorial-pink transition-colors">Societal Shifts</a></li>
+                    <li><a href="#" onclick="filterCategory('SOCIETAL ISSUES')" class="hover:text-editorial-pink transition-colors">Societal Issues</a></li>
                     <li><a href="#" onclick="filterCategory('CULTURE')" class="hover:text-editorial-pink transition-colors">Digital Culture</a></li>
                 </ul>
             </div>
@@ -386,7 +363,7 @@
     <div id="article-reader-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-6">
         <div class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden">
             <div class="p-4 sm:p-6 bg-editorial-black text-white flex justify-between items-center shrink-0">
-                <span id="reader-category-pill" class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full">FASHION</span>
+                <span id="reader-category-pill" class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full">SOCIETAL ISSUES</span>
                 <button onclick="closeArticleReader()" class="text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 sm:p-10 overflow-y-auto custom-scrollbar space-y-6 flex-grow">
@@ -422,7 +399,7 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION NOTIFICATION BAR -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast-notification" class="fixed bottom-6 right-6 bg-editorial-black text-white border-2 border-editorial-lime px-4 py-3 rounded-xl shadow-neo-lg z-50 hidden flex items-center gap-3 font-mono text-xs">
         <span class="w-2.5 h-2.5 rounded-full bg-editorial-lime animate-ping"></span>
         <span id="toast-message">Action successful</span>
@@ -431,7 +408,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-        import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, deleteDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCeRBJPDIWsuRQp1N1EfpeDydb2xzfNBCk",
@@ -458,19 +435,19 @@
             tagline: "THE DEEP-DIVE JOURNAL INTO MODERN PHENOMENA",
             volIssue: "VOL. 26 • ISSUE 09",
             edition: "GLOBAL DIGITAL EDITION",
-            radarQuestion: "Is AI-generated haute couture genuine art or glorified digital plagiarism?",
-            categories: ["ALL", "FASHION", "LIFESTYLE", "SOCIETAL ISSUES", "CULTURE", "NEWS", "LIVING"]
+            radarQuestion: "Is rigorous academic strictness genuine education or performative power?",
+            categories: ["ALL", "FASHION", "LIFESTYLE", "SOCIETAL ISSUES", "CULTURE"]
         };
 
         window.tickerItems = [
-            "🔥 BURNING INQUIRY: WHY ARE 90S VINTAGE CAMERAS DOMINATING GEN Z FEEDS?",
+            "🔥 BURNING INQUIRY: STRICT PROFESSOR OR JUST ON A POWER TRIP?",
             "✨ CULTURAL SHIFT: THE RETURN OF WIRED HEADPHONES AS STATUS SYMBOLS",
             "⚡ TRENDING: WHY ARE DIGITAL CAMERA SALES SPIKING AMONG GEN Z?",
             "🎯 DEEP DIVE: THE ARCHITECTURE OF MODERN PRODUCTIVITY ANXIETY"
         ];
 
         window.curiosityQuestions = [
-            { id: 1, text: "Why are luxury fashion houses reviving 90s minimalism in an era of digital chaos?" },
+            { id: 1, text: "Strict Professor or Just on a Power Trip?" },
             { id: 2, text: "Why do we feel compelled to document every meal in aesthetic high-definition?" },
             { id: 3, text: "Why is open-office architecture surviving despite universal employee exhaustion?" },
             { id: 4, text: "Why has analog journaling spiked among high-performing tech executives?" }
@@ -479,13 +456,13 @@
         window.articles = [
             {
                 id: 'art-1',
-                title: "The Death of Fast Fashion: Why Digital Natives Prefer Vintage Archives",
-                category: "FASHION",
-                excerpt: "Tactile history and individualism are outshining disposable trends as resale platforms boom worldwide.",
-                content: "We live in an era of infinite digital replication where any outfit can be rendered in seconds. Yet, physical garments carrying history, wear, and provenance have become the ultimate luxury.\n\n## The Psychology of Patina\nWhen everything is new and mass-produced, manufactured perfection loses its cachet. Vintage archives represent rebellion against algorithmic speed. Every frayed hem and faded wash tells a story that algorithms cannot simulate.\n\n> 'To wear vintage in 2026 is to anchor oneself in a tangible timeline.'",
-                image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1200",
-                author: "Kean Donato",
-                date: "OCTOBER 24, 2026",
+                title: "Strict Professor or Just on a Power Trip?",
+                category: "SOCIETAL ISSUES",
+                excerpt: "When does 'high standards' stop being good teaching and start feeling like an ego trip?",
+                content: "When does “high standards” stop being good teaching and start feeling like an ego trip?\n\nEvery student has met that professor.\n\nThe one whose name alone makes the class go silent.\n\nStrict rules. Endless recitations. Brutal exams. Somehow, one question turns into a 15-minute interrogation.\n\nBut here’s the real question: Does being strict actually make students learn better?\n\n## Strict Isn’t the Problem\nHigh standards aren’t the issue. Deadlines, readings, and challenging questions are part of college.\n\nFor example, in a Political Science recitation, follow-up questions can help test whether a student really understands their answer.\n\nBut when the questioning keeps going just to embarrass someone in front of the class, it stops feeling like teaching and starts feeling like humiliation.\n\n## When Rules Become Too Much\nNo late submissions. No phones. No excuses.\n\nRules can create discipline, but when every small mistake becomes a big offense, students start wondering if the goal is learning—or just showing who’s in charge.\n\n## The “Did We Even Study This?” Exam\nHard exams are fair if they test what students learned.\n\nBut questions that go way beyond the readings or discussions can make students feel like they’re being set up to fail instead of being assessed.\n\n## The Boring Lecture Problem\nStudents are told to think critically, yet some classes become the same cycle:\n\nProfessor talks. Students take notes. Repeat.\n\nTraditional lectures have their place, but learning feels different when students are actually invited to discuss and question ideas.\n\n## So, Strict or Power Trip?\nThe problem isn’t strictness—it’s the purpose behind it.\n\nChallenge students. Give fair but difficult exams. Expect effort.\n\n> 'If teaching relies on humiliation, unnecessary rules, or making students struggle just to prove authority, it’s worth asking: Is this really about education, or is it about ego?'\n\nThe best professors aren’t the ones students fear the most. They’re the ones who challenge students without making them hate learning.",
+                image: "f4f7575f-3185-4885-89c5-b9ab834a4e3b.jpg",
+                author: "Unidentified Thomasian",
+                date: "SEPTEMBER 27, 2026",
                 isHero: true,
                 isEditorPick: false
             },
@@ -512,58 +489,17 @@
                 date: "OCTOBER 19, 2026",
                 isHero: false,
                 isEditorPick: false
-            },
-            {
-                id: 'art-4',
-                title: "The Rise of Neo-Analog Escapism in Modern Urban Centers",
-                category: "SOCIETAL ISSUES",
-                excerpt: "Why city dwellers are trading smart apartments for dumb phones, film cameras, and paper notebooks.",
-                content: "Smart homes have automated our lights, thermostats, and grocery lists. In response, a quiet counter-ranking counter-revolution is taking root in urban apartments.\n\n## The Return of Analog Sanctuary\nRemoving screens from bedrooms is no longer just wellness advice—it is considered radical interior design. People are actively seeking environments where technology asks for nothing in return.",
-                image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=1200",
-                author: "Sora Takahashi",
-                date: "OCTOBER 15, 2026",
-                isHero: false,
-                isEditorPick: false
             }
         ];
 
         window.radarPoll = {
-            option1Title: "GENUINE ART",
-            option1Votes: 64,
-            option2Title: "PLAGIARISM",
-            option2Votes: 36
+            option1Title: "GENUINE EDUCATION",
+            option1Votes: 58,
+            option2Title: "POWER TRIP",
+            option2Votes: 42
         };
 
         window.subscribers = ["editor@okaybutwhy.org", "reader.pulse@outlook.com"];
-
-        window.initFirebaseSync = function() {
-            try {
-                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), (snapshot) => {
-                    if (!snapshot.empty) {
-                        const cloudArticles = [];
-                        snapshot.forEach(docSnap => cloudArticles.push({ id: docSnap.id, ...docSnap.data() }));
-                        window.articles = cloudArticles;
-                    }
-                    renderApp();
-                }, (err) => console.log("Articles sync fallback:", err));
-
-                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'site_settings', 'branding'), (docSnap) => {
-                    if (docSnap.exists()) {
-                        window.siteBranding = docSnap.data();
-                        applySiteBranding();
-                    }
-                }, (err) => console.log("Branding sync fallback:", err));
-
-                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'ticker', 'items'), (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().items) {
-                        window.tickerItems = docSnap.data().items;
-                        renderTicker();
-                    }
-                }, (err) => console.log("Ticker sync fallback:", err));
-            } catch (e) {
-                console.log("Firebase sync init error:", e);
-            }
-        };
 
         window.renderApp = function() {
             renderCategoryTabs();
@@ -571,16 +507,6 @@
             renderArticlesGrid();
             renderEditorPick();
             renderCuriosityRadar();
-        };
-
-        window.applySiteBranding = function() {
-            document.getElementById('site-brand-part1').innerText = window.siteBranding.brand1;
-            document.getElementById('site-brand-part2-text').innerText = window.siteBranding.brand2;
-            document.getElementById('site-tagline').innerText = window.siteBranding.tagline;
-            document.getElementById('site-vol-issue').innerText = window.siteBranding.volIssue;
-            document.getElementById('site-edition').innerText = window.siteBranding.edition;
-            const radarQ = document.getElementById('radar-question-text');
-            if (radarQ) radarQ.innerText = `"${window.siteBranding.radarQuestion}"`;
         };
 
         window.renderCategoryTabs = function() {
@@ -743,7 +669,7 @@
                 <div onclick="voteRadar(1)" class="p-3 bg-gray-900 border border-gray-700 hover:border-editorial-lime rounded-xl cursor-pointer transition-all relative overflow-hidden group">
                     <div class="absolute left-0 top-0 bottom-0 bg-editorial-lime/20 transition-all duration-500" style="width: ${p1}%"></div>
                     <div class="relative z-10 flex justify-between items-center text-xs font-mono font-bold">
-                        <span>${window.radarPoll.option1Title} 🎨</span>
+                        <span>${window.radarPoll.option1Title} 📚</span>
                         <span class="text-editorial-lime">${p1}%</span>
                     </div>
                 </div>
@@ -766,9 +692,8 @@
 
         window.handleRadarPromptSubmit = function(e) {
             e.preventDefault();
-            const val = document.getElementById('radar-user-prompt').value;
-            showToast("Submitted successfully to editorial team!");
             document.getElementById('radar-user-prompt').value = '';
+            showToast("Submitted successfully to editorial team!");
         };
 
         window.voteCuriosity = function(type) {
@@ -875,9 +800,7 @@
         });
 
         window.onload = function() {
-            applySiteBranding();
             renderTicker();
-            initFirebaseSync();
             renderApp();
             document.getElementById('saved-count').innerText = window.savedArticleIds.length;
         };

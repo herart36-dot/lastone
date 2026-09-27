@@ -257,6 +257,37 @@
         }
         body.dark-mode .hero-image-credit { color: #aaa; }
 
+        /* ---- MOBILE + SMOOTH UI FIXES ---- */
+        html, body { max-width: 100%; overflow-x: clip; }
+        button, a { -webkit-tap-highlight-color: transparent; }
+        .modal-close-btn { width:44px; height:44px; min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:2px solid rgba(255,255,255,.22); transition:transform .2s ease,background-color .2s ease,color .2s ease,border-color .2s ease; touch-action:manipulation; }
+        .modal-close-btn:hover { transform:scale(1.04); background:#FF0055; color:#fff; border-color:#FF0055; }
+        .modal-close-btn:active { transform:scale(.96); }
+        .smooth-modal { visibility:hidden; opacity:0; pointer-events:none; transition:opacity .28s cubic-bezier(.2,.8,.2,1),visibility 0s linear .28s; }
+        .smooth-modal.is-open { visibility:visible; opacity:1; pointer-events:auto; transition:opacity .28s cubic-bezier(.2,.8,.2,1),visibility 0s linear 0s; }
+        .smooth-modal-card { transform:translateY(12px) scale(.98); opacity:.98; transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .28s ease; }
+        .smooth-modal.is-open .smooth-modal-card { transform:translateY(0) scale(1); opacity:1; }
+        #privacy-consent-gate { visibility:hidden; opacity:0; pointer-events:none; transition:opacity .32s ease,visibility 0s linear .32s; }
+        #privacy-consent-gate.is-open { visibility:visible; opacity:1; pointer-events:auto; transition:opacity .32s ease,visibility 0s linear 0s; }
+        #privacy-consent-card { transform:translateY(16px) scale(.98); opacity:.96; transition:transform .36s cubic-bezier(.2,.8,.2,1),opacity .3s ease; }
+        #privacy-consent-gate.is-open #privacy-consent-card { transform:translateY(0) scale(1); opacity:1; }
+        .category-page-shell { opacity:0; transform:translateY(10px); transition:opacity .3s ease,transform .3s ease; }
+        .category-page-shell.is-active { opacity:1; transform:translateY(0); }
+        .category-tab { min-height:40px; touch-action:manipulation; }
+        #inquiry-section { scroll-margin-top: 100px; }
+        .inquiry-input { min-height: 46px; }
+        #inquiry-status { border:2px solid #171717; border-radius:.75rem; padding:.75rem 1rem; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:10px; line-height:1.5; }
+        #inquiry-status.success { background:rgba(180,255,0,.22); color:#171717; }
+        #inquiry-status.error { background:rgba(255,0,85,.10); color:#171717; }
+        body.dark-mode #inquiry-section .bg-white { background-color:#17171A !important; }
+        body.dark-mode #inquiry-section { color:#FAF8F5; }
+        body.dark-mode #inquiry-section .text-editorial-black { color:#FAF8F5 !important; }
+        body.dark-mode #inquiry-section .inquiry-input { background:#222226; color:#FAF8F5; border-color:#3a3a3f; }
+        body.dark-mode #inquiry-status.success { color:#FAF8F5; }
+        body.dark-mode #inquiry-status.error { color:#FAF8F5; }
+        @media (max-width:639px) { #article-reader-modal { align-items:flex-start; padding:.5rem; } #article-modal-card { max-height:calc(100dvh - 1rem); border-width:3px; border-radius:1rem; } #reader-scroll-area { padding:1rem; } #privacy-consent-card { max-height:88dvh; padding:1rem; box-shadow:5px 5px 0 #FF0055; } #privacy-consent-card .privacy-note { font-size:.75rem; } #category-tabs-container { justify-content:flex-start !important; padding-bottom:.5rem; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+
         /* ---- INTERACTIVE / AESTHETIC LAYER ---- */
         #cursor-glow {
             position: fixed;
@@ -396,6 +427,9 @@
                     <i class="fa-solid fa-bookmark text-editorial-pink text-xs"></i> <span class="hidden sm:inline">SAVED</span>
                     <span id="saved-count" class="bg-editorial-pink text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
                 </button>
+                <button onclick="scrollToInquiry()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer flex items-center gap-1.5 bg-editorial-black text-white px-2.5 py-1 rounded-full border border-editorial-border" title="Send an inquiry">
+                    <i class="fa-solid fa-paper-plane text-editorial-lime text-xs"></i> <span class="hidden sm:inline">INQUIRY</span>
+                </button>
             </div>
         </div>
 
@@ -522,10 +556,84 @@
                 </div>
             </aside>
         </div>
+
+        <!-- INQUIRY / WORK WITH ME -->
+        <section id="inquiry-section" class="bg-editorial-black text-white border-3 border-editorial-border rounded-2xl shadow-neo-lg overflow-hidden relative">
+            <div class="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-editorial-pink/15 blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-5 gap-0">
+                <div class="lg:col-span-2 p-6 sm:p-8 lg:p-10 border-b-2 lg:border-b-0 lg:border-r-2 border-gray-800 space-y-5">
+                    <div class="inline-flex items-center gap-2 bg-editorial-lime text-editorial-black border-2 border-editorial-border rounded-full px-3 py-1 font-mono text-[10px] font-bold uppercase">
+                        <i class="fa-solid fa-paper-plane"></i> JOURNAL DESK
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-editorial-pink mb-2">HAVE SOMETHING TO SAY?</p>
+                        <h2 class="font-display text-3xl sm:text-4xl font-extrabold uppercase leading-none">SEND AN INQUIRY</h2>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        Have a story to share, want to work with me, need a website, or simply have a suggestion? Send it through the Journal Desk.
+                    </p>
+                    <div class="space-y-2 text-[10px] font-mono text-gray-400 border-t border-gray-800 pt-4">
+                        <p><i class="fa-solid fa-circle-check text-editorial-lime mr-1"></i> Your email is required so I can reply.</p>
+                        <p><i class="fa-solid fa-shield-halved text-editorial-pink mr-1"></i> Only the information you enter in this form is sent with your inquiry.</p>
+                        <p><i class="fa-solid fa-triangle-exclamation text-editorial-lime mr-1"></i> Please do not include passwords, financial details, or other sensitive information.</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3 p-6 sm:p-8 lg:p-10 bg-white text-editorial-black">
+                    <form id="inquiry-form" onsubmit="handleInquirySubmit(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="inquiry-name" class="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5">Name <span class="text-editorial-gray font-normal">(optional)</span></label>
+                                <input id="inquiry-name" name="name" type="text" autocomplete="name" maxlength="120" placeholder="Your name" class="inquiry-input w-full px-3 py-3 bg-editorial-cream border-2 border-editorial-border rounded-xl text-base sm:text-xs font-mono focus:outline-none focus:border-editorial-pink transition-colors">
+                            </div>
+                            <div>
+                                <label for="inquiry-email" class="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5">Email <span class="text-editorial-pink">*</span></label>
+                                <input id="inquiry-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="your@email.com" class="inquiry-input w-full px-3 py-3 bg-editorial-cream border-2 border-editorial-border rounded-xl text-base sm:text-xs font-mono focus:outline-none focus:border-editorial-pink transition-colors">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="inquiry-type" class="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5">What is your inquiry about? <span class="text-editorial-pink">*</span></label>
+                            <select id="inquiry-type" name="inquiryType" required class="inquiry-input w-full px-3 py-3 bg-editorial-cream border-2 border-editorial-border rounded-xl text-base sm:text-xs font-mono focus:outline-none focus:border-editorial-pink transition-colors">
+                                <option value="">Choose one...</option>
+                                <option value="Submit a story">Submit a story</option>
+                                <option value="Work with me">Work with me</option>
+                                <option value="Create a website">Create a website for me</option>
+                                <option value="Suggestion / feedback">Suggestion / feedback</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="inquiry-website" class="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5">Website / link <span class="text-editorial-gray font-normal">(optional)</span></label>
+                            <input id="inquiry-website" name="website" type="url" inputmode="url" autocomplete="url" maxlength="500" placeholder="https://yourwebsite.com" class="inquiry-input w-full px-3 py-3 bg-editorial-cream border-2 border-editorial-border rounded-xl text-base sm:text-xs font-mono focus:outline-none focus:border-editorial-pink transition-colors">
+                        </div>
+
+                        <div>
+                            <label for="inquiry-message" class="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5">Your message <span class="text-editorial-pink">*</span></label>
+                            <textarea id="inquiry-message" name="message" required minlength="10" maxlength="5000" rows="6" placeholder="Tell me what you have in mind..." class="inquiry-input w-full px-3 py-3 bg-editorial-cream border-2 border-editorial-border rounded-xl text-base sm:text-xs font-mono focus:outline-none focus:border-editorial-pink transition-colors resize-y"></textarea>
+                        </div>
+
+                        <div class="hidden" aria-hidden="true">
+                            <label for="inquiry-company">Company</label>
+                            <input id="inquiry-company" name="company" type="text" tabindex="-1" autocomplete="off">
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+                            <button id="inquiry-submit" type="submit" class="w-full sm:w-auto bg-editorial-black hover:bg-editorial-pink text-white border-2 border-editorial-border px-5 py-3 rounded-xl font-mono text-xs font-bold uppercase shadow-neo transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                                SEND INQUIRY <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                            <p class="text-[10px] font-mono text-editorial-gray leading-relaxed">By sending, you are choosing to share the information you enter here so the site owner can respond to your inquiry.</p>
+                        </div>
+                        <div id="inquiry-status" class="hidden" role="status" aria-live="polite"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
       </div>
 
       <!-- DEDICATED CATEGORY PAGE -->
-      <div id="category-view" class="hidden space-y-6">
+      <div id="category-view" class="hidden space-y-6 category-page-shell">
         <button onclick="goHome()" class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase text-editorial-gray hover:text-editorial-pink transition-colors cursor-pointer">
             <i class="fa-solid fa-arrow-left"></i> BACK TO ALL INQUIRIES
         </button>
@@ -562,6 +670,7 @@
                     <li><a href="#" onclick="filterCategory('LIFESTYLE')" class="hover:text-editorial-pink transition-colors">Modern Lifestyle</a></li>
                     <li><a href="#" onclick="filterCategory('SOCIETAL ISSUES')" class="hover:text-editorial-pink transition-colors">Societal Issues</a></li>
                     <li><a href="#" onclick="filterCategory('CULTURE')" class="hover:text-editorial-pink transition-colors">Digital Culture</a></li>
+                    <li><a href="#inquiry" onclick="scrollToInquiry(); return false;" class="hover:text-editorial-pink transition-colors">Send an Inquiry</a></li>
                 </ul>
             </div>
             <div class="space-y-2 text-xs font-mono">
@@ -578,13 +687,13 @@
     </footer>
 
     <!-- FULL FUNCTIONING SEARCH MODAL -->
-    <div id="search-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-start justify-center pt-20 p-4">
-        <div class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-2xl rounded-2xl shadow-neo-lg p-6 space-y-4 relative">
+    <div id="search-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-start justify-center pt-20 p-4 smooth-modal">
+        <div class="smooth-modal-card bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-2xl rounded-2xl shadow-neo-lg p-6 space-y-4 relative">
             <div class="flex justify-between items-center border-b-2 border-editorial-border pb-3">
                 <h3 class="font-display text-lg font-extrabold uppercase flex items-center gap-2">
                     <i class="fa-solid fa-magnifying-glass text-editorial-pink"></i> SEARCH INQUIRIES
                 </h3>
-                <button onclick="closeSearchModal()" class="text-xl font-bold hover:text-editorial-pink cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeSearchModal()" class="modal-close-btn text-xl font-bold text-editorial-black cursor-pointer" aria-label="Close search"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <input type="text" id="search-input" oninput="handleSearchInput(event)" placeholder="Type keyword (e.g. strict, fashion, scrolling)..." class="w-full px-4 py-3 bg-white border-2 border-editorial-border rounded-xl font-mono text-sm focus:outline-none focus:border-editorial-pink">
             <div id="search-results-container" class="max-h-60 overflow-y-auto custom-scrollbar space-y-2">
@@ -594,14 +703,14 @@
     </div>
 
     <!-- SOCIAL SHARE MODAL -->
-    <div id="share-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] hidden items-center justify-center p-4" onclick="handleShareModalOutside(event)">
-        <div class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-md rounded-2xl shadow-neo-lg p-6 space-y-5 relative" onclick="event.stopPropagation()">
+    <div id="share-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] items-center justify-center p-4 smooth-modal" onclick="handleShareModalOutside(event)">
+        <div class="smooth-modal-card bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-md rounded-2xl shadow-neo-lg p-6 space-y-5 relative" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start gap-4 border-b-2 border-editorial-border pb-4">
                 <div>
                     <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-editorial-pink">SHARE THIS STORY</span>
                     <h3 id="share-modal-title" class="font-display text-xl font-extrabold uppercase leading-tight mt-1">Share article</h3>
                 </div>
-                <button onclick="closeShareModal()" class="text-xl font-bold hover:text-editorial-pink cursor-pointer" aria-label="Close share menu"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeShareModal()" class="modal-close-btn text-xl font-bold text-editorial-black cursor-pointer" aria-label="Close share menu"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -630,8 +739,8 @@
     </div>
 
     <!-- ARTICLE READER FULL MODAL -->
-    <div id="article-reader-modal" onclick="handleOutsideModalClick(event)" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center justify-center p-2 sm:p-6">
-        <div id="article-modal-card" class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden transform transition-all duration-300 scale-95">
+    <div id="article-reader-modal" onclick="handleOutsideModalClick(event)" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-6 smooth-modal">
+        <div id="article-modal-card" class="smooth-modal-card bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden">
             <div id="reading-progress-track" class="w-full shrink-0"><div id="reading-progress-bar"></div></div>
             <div class="p-4 sm:p-6 bg-editorial-black text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3">
@@ -643,7 +752,7 @@
                     <button onclick="toggleSaveArticle(window.currentReaderId)" title="Save this inquiry" class="text-gray-400 hover:text-editorial-pink text-lg cursor-pointer">
                         <i id="reader-save-icon" class="fa-bookmark fa-regular"></i>
                     </button>
-                    <button onclick="closeArticleReader()" class="text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="closeArticleReader()" class="modal-close-btn text-gray-300 cursor-pointer" aria-label="Close article"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
             <div id="reader-scroll-area" class="p-6 sm:p-10 overflow-y-auto custom-scrollbar space-y-6 flex-grow">
@@ -1131,24 +1240,28 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             const container = document.getElementById('category-tabs-container');
             if (!container) return;
             container.innerHTML = window.siteBranding.categories.map(cat => `
-                <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${window.activeCategory === cat ? 'bg-editorial-black text-white shadow-neo' : 'bg-editorial-cream text-editorial-black hover:bg-editorial-sand'}">
+                <button onclick="filterCategory('${cat}')" class="category-tab px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${window.activeCategory === cat ? 'bg-editorial-black text-white shadow-neo' : 'bg-editorial-cream text-editorial-black hover:bg-editorial-sand'}">
                     ${cat}
                 </button>
             `).join('');
         };
 
         window.filterCategory = function(cat) {
-            if (cat === 'ALL') {
-                goHome();
-                return;
-            }
-            window.activeCategory = cat;
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('category-view').classList.remove('hidden');
-            renderCategoryPage(cat);
+            const normalized = String(cat || 'ALL').toUpperCase();
+            if (!window.siteBranding.categories.includes(normalized)) return;
+            if (normalized === 'ALL') { goHome(); return; }
+            window.activeCategory = normalized;
+            const home = document.getElementById('home-view');
+            const view = document.getElementById('category-view');
+            if (!home || !view) return;
+            home.classList.add('hidden');
+            view.classList.remove('hidden');
+            view.classList.remove('is-active');
+            renderCategoryPage(normalized);
             renderCategoryTabs();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            history.replaceState(null, '', '#/category/' + encodeURIComponent(cat.toLowerCase()));
+            requestAnimationFrame(() => view.classList.add('is-active'));
+            history.replaceState(null, '', '#/category/' + encodeURIComponent(normalized.toLowerCase()));
+            setTimeout(() => { const main = document.querySelector('main'); if (main) main.scrollIntoView({ behavior:'smooth', block:'start' }); }, 30);
         };
 
         window.renderTicker = function() {
@@ -1248,20 +1361,21 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             const countEl = document.getElementById('category-view-count');
             const grid = document.getElementById('category-view-grid');
             if (!titleEl || !grid) return;
-            const matches = window.articles.filter(a => a.category.toUpperCase() === cat.toUpperCase());
+            const matches = window.articles.filter(a => String(a.category || '').toUpperCase() === String(cat).toUpperCase());
             titleEl.innerText = cat;
             countEl.innerText = `${matches.length} INQUIR${matches.length === 1 ? 'Y' : 'IES'}`;
-            grid.innerHTML = matches.length
-                ? matches.map(art => renderArticleCardHTML(art)).join('')
-                : `<p class="col-span-full text-sm font-mono text-editorial-gray py-10 text-center">No inquiries published in this section yet.</p>`;
+            grid.innerHTML = matches.length ? matches.map(art => renderArticleCardHTML(art)).join('') : `<p class="col-span-full text-sm font-mono text-editorial-gray py-10 text-center">No inquiries published in this section yet.</p>`;
+            grid.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'));
         };
 
         window.goHome = function() {
             window.activeCategory = 'ALL';
-            document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('category-view').classList.add('hidden');
+            const home = document.getElementById('home-view');
+            const view = document.getElementById('category-view');
+            if (home) home.classList.remove('hidden');
+            if (view) { view.classList.remove('is-active'); view.classList.add('hidden'); }
             renderCategoryTabs();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => window.scrollTo({ top:0, behavior:'smooth' }), 20);
             history.replaceState(null, '', window.location.pathname + window.location.search);
         };
 
@@ -1345,13 +1459,7 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             };
 
             const modal = document.getElementById('article-reader-modal');
-            const card = document.getElementById('article-modal-card');
-            modal.classList.remove('hidden', 'pointer-events-none');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                card.classList.remove('scale-95');
-                card.classList.add('scale-100');
-            }, 10);
+            if (modal) modal.classList.add('is-open');
 
             history.replaceState(null, '', '#article/' + id);
         };
@@ -1398,16 +1506,14 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             if (titleEl) titleEl.textContent = art.title;
             const modal = document.getElementById('share-modal');
             if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+                modal.classList.add('is-open');
             }
         };
 
         window.closeShareModal = function() {
             const modal = document.getElementById('share-modal');
             if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+                modal.classList.remove('is-open');
             }
         };
 
@@ -1479,6 +1585,86 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             showToast('Here\'s a random deep-dive for you!');
         };
 
+        window.inquiryEndpoint = 'https://formsubmit.co/ajax/herart36@gmail.com';
+
+        window.scrollToInquiry = function() {
+            const home = document.getElementById('home-view');
+            const inquiry = document.getElementById('inquiry-section');
+            if (!inquiry) return;
+            if (home && home.classList.contains('hidden')) {
+                goHome();
+                setTimeout(() => inquiry.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+            } else {
+                inquiry.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            history.replaceState(null, '', '#inquiry');
+        };
+
+        window.handleInquirySubmit = async function(e) {
+            e.preventDefault();
+            const form = document.getElementById('inquiry-form');
+            const submitButton = document.getElementById('inquiry-submit');
+            const status = document.getElementById('inquiry-status');
+            if (!form || !submitButton || !status) return;
+
+            const email = document.getElementById('inquiry-email').value.trim();
+            const name = document.getElementById('inquiry-name').value.trim();
+            const inquiryType = document.getElementById('inquiry-type').value;
+            const website = document.getElementById('inquiry-website').value.trim();
+            const message = document.getElementById('inquiry-message').value.trim();
+            const honeypot = document.getElementById('inquiry-company').value.trim();
+
+            if (honeypot) return;
+            if (!email || !inquiryType || message.length < 10) {
+                status.className = 'error';
+                status.textContent = 'Please add your email, choose an inquiry type, and write at least 10 characters.';
+                status.classList.remove('hidden');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'SENDING... <i class="fa-solid fa-spinner fa-spin ml-1"></i>';
+            status.classList.add('hidden');
+
+            try {
+                const response = await fetch(window.inquiryEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        _subject: `[OKAY, BUT WHY?] ${inquiryType}`,
+                        _template: 'table',
+                        _captcha: 'true',
+                        name: name || 'Not provided',
+                        email: email,
+                        inquiryType: inquiryType,
+                        website: website || 'Not provided',
+                        message: message,
+                        submittedAt: new Date().toISOString(),
+                        sourcePage: window.location.origin + window.location.pathname
+                    })
+                });
+
+                const result = await response.json().catch(() => ({ success: response.ok }));
+                if (!response.ok || result.success === false) throw new Error('Inquiry failed');
+
+                form.reset();
+                status.className = 'success';
+                status.innerHTML = '<strong>INQUIRY SENT.</strong> Thank you. Your message has been sent to the Journal Desk. Please check your email for a reply when appropriate.';
+                status.classList.remove('hidden');
+                showToast('Inquiry sent successfully!');
+            } catch (err) {
+                status.className = 'error';
+                status.textContent = 'We could not send your inquiry right now. Please try again in a moment.';
+                status.classList.remove('hidden');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'SEND INQUIRY <i class="fa-solid fa-arrow-right ml-1"></i>';
+            }
+        };
+
         // Newsletter subscription powered by FormSubmit (no server or Google Apps Script required).
         // The first submission will trigger a one-time activation email to herart36@gmail.com.
         window.newsletterEndpoint = 'https://formsubmit.co/ajax/herart36@gmail.com';
@@ -1526,15 +1712,10 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
 
         window.closeArticleReader = function() {
             const modal = document.getElementById('article-reader-modal');
-            const card = document.getElementById('article-modal-card');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            card.classList.remove('scale-100');
-            card.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            if (!modal) return;
+            modal.classList.remove('is-open');
             window.currentReaderId = null;
-            if (window.location.hash.startsWith('#article/')) {
-                history.replaceState(null, '', window.location.pathname + window.location.search);
-            }
+            if (window.location.hash.startsWith('#article/')) history.replaceState(null, '', window.location.pathname + window.location.search);
         };
 
         window.handleOutsideModalClick = function(e) {
@@ -1568,13 +1749,16 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
         };
 
         // Fully functioning search handlers
-        window.openSearchModal = function() { 
-            document.getElementById('search-modal').classList.remove('hidden');
-            document.getElementById('search-input').focus();
+        window.openSearchModal = function() {
+            const modal = document.getElementById('search-modal');
+            if (!modal) return;
+            modal.classList.add('is-open');
+            setTimeout(() => document.getElementById('search-input')?.focus(), 80);
         };
 
-        window.closeSearchModal = function() { 
-            document.getElementById('search-modal').classList.add('hidden'); 
+        window.closeSearchModal = function() {
+            const modal = document.getElementById('search-modal');
+            if (modal) modal.classList.remove('is-open');
         };
 
         window.handleSearchInput = function(e) {
@@ -1664,6 +1848,7 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             const gate = document.getElementById('privacy-consent-gate');
             if (!gate) return;
             gate.classList.remove('hidden');
+            requestAnimationFrame(() => gate.classList.add('is-open'));
             document.body.classList.add('privacy-gate-open');
             const decline = document.getElementById('privacy-decline-message');
             if (decline) decline.classList.add('hidden');
@@ -1672,7 +1857,8 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
         function hidePrivacyGate() {
             const gate = document.getElementById('privacy-consent-gate');
             if (!gate) return;
-            gate.classList.add('hidden');
+            gate.classList.remove('is-open');
+            setTimeout(() => gate.classList.add('hidden'), 340);
             document.body.classList.remove('privacy-gate-open');
         }
 
@@ -1805,6 +1991,8 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
             }
             if (window.location.hash.startsWith('#/category/') || window.location.hash.startsWith('#article/')) {
                 handleRouteFromHash();
+            } else if (window.location.hash === '#inquiry') {
+                setTimeout(() => scrollToInquiry(), 120);
             }
         };
     </script>

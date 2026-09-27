@@ -328,17 +328,22 @@
                 </div>
 
                 <div id="newsletter-card" class="bg-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4">
-                    <div class="space-y-1">
-                        <h4 class="font-brand text-xl font-extrabold uppercase text-editorial-black">THE THOMASIAN</h4>
+                    <div class="space-y-2">
+                        <div class="inline-flex items-center gap-2 bg-editorial-cream border-2 border-editorial-border rounded-full px-3 py-1">
+                            <i class="fa-regular fa-envelope text-editorial-pink"></i>
+                            <span class="text-[10px] font-mono font-bold uppercase">JOIN THE EDITION</span>
+                        </div>
+                        <h4 class="font-brand text-xl font-extrabold uppercase text-editorial-black">NEVER MISS A NEW POST</h4>
                         <p class="text-xs text-editorial-gray font-sans">
-                            Get our weekly deep-dive editorial breakdown delivered straight to your inbox every Sunday morning.
+                            Subscribe with your Gmail or email address and get a notification when a new deep-dive, feature, or site update is published. No spam.
                         </p>
                     </div>
                     <form id="newsletter-form" onsubmit="handleNewsletterSubmit(event)" class="space-y-2">
-                        <input type="email" id="newsletter-email" required placeholder="your@email.com" class="newsletter-input w-full px-3 py-2 bg-editorial-cream border-2 border-editorial-border rounded-lg text-base sm:text-xs font-mono text-editorial-black transition-colors">
-                        <button type="submit" class="w-full bg-editorial-black hover:bg-editorial-pink text-white text-[11px] font-mono font-bold uppercase px-3 py-2.5 rounded-lg cursor-pointer shadow-neo transition-colors">
-                            SUBSCRIBE
+                        <input type="email" id="newsletter-email" name="email" required autocomplete="email" placeholder="your@email.com" aria-label="Email address" class="newsletter-input w-full px-3 py-2 bg-editorial-cream border-2 border-editorial-border rounded-lg text-base sm:text-xs font-mono text-editorial-black transition-colors">
+                        <button id="newsletter-submit" type="submit" class="w-full bg-editorial-black hover:bg-editorial-pink text-white text-[11px] font-mono font-bold uppercase px-3 py-2.5 rounded-lg cursor-pointer shadow-neo transition-colors">
+                            SUBSCRIBE FOR UPDATES
                         </button>
+                        <p class="text-[10px] text-editorial-gray font-mono text-center">Your email is used only for OKAY, BUT WHY? updates.</p>
                     </form>
                 </div>
             </aside>
@@ -833,15 +838,49 @@
             showToast('Here\'s a random deep-dive for you!');
         };
 
-        window.handleNewsletterSubmit = function(e) {
+        // Newsletter subscription powered by FormSubmit (no server or Google Apps Script required).
+        // The first submission will trigger a one-time activation email to herart36@gmail.com.
+        window.newsletterEndpoint = 'https://formsubmit.co/ajax/herart36@gmail.com';
+
+        window.handleNewsletterSubmit = async function(e) {
             e.preventDefault();
-            const emailInput = document.getElementById('newsletter-email');
-            const email = emailInput.value;
-            localStorage.setItem('obw_subscribed', email);
-            const card = document.getElementById('newsletter-card');
             const form = document.getElementById('newsletter-form');
-            form.innerHTML = `<div class="flex items-center gap-2 text-editorial-black bg-editorial-lime/40 border-2 border-editorial-border rounded-lg px-3 py-2.5"><i class="fa-solid fa-circle-check text-editorial-pink"></i><span class="text-xs font-mono font-bold">SUBSCRIBED — WELCOME ABOARD</span></div>`;
-            showToast('Subscribed! Check your inbox Sunday morning.');
+            const emailInput = document.getElementById('newsletter-email');
+            const submitButton = document.getElementById('newsletter-submit');
+            const email = emailInput.value.trim();
+            if (!email) return;
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'SUBSCRIBING...';
+
+            try {
+                const response = await fetch(window.newsletterEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        source: window.location.href,
+                        subscribedAt: new Date().toISOString(),
+                        _subject: 'New OKAY, BUT WHY? Newsletter Subscriber',
+                        _template: 'table',
+                        _captcha: 'true'
+                    })
+                });
+
+                const result = await response.json().catch(() => ({ success: response.ok }));
+                if (!response.ok || result.success === false) throw new Error('Subscription failed');
+
+                localStorage.setItem('obw_subscribed', email);
+                form.innerHTML = `<div class="space-y-2 text-editorial-black bg-editorial-lime/40 border-2 border-editorial-border rounded-lg px-3 py-3"><div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-editorial-pink"></i><span class="text-xs font-mono font-bold">SUBSCRIBED — WELCOME ABOARD</span></div><p class="text-[10px] font-mono">You’ll hear from us when something new is published.</p></div>`;
+                showToast('Subscribed successfully!');
+            } catch (err) {
+                submitButton.disabled = false;
+                submitButton.textContent = 'SUBSCRIBE FOR UPDATES';
+                showToast('We could not subscribe you right now. Please try again.');
+            }
         };
 
         window.closeArticleReader = function() {

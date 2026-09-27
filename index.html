@@ -359,9 +359,9 @@
         </div>
     </footer>
 
-    <!-- ARTICLE READER FULL MODAL -->
-    <div id="article-reader-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-6">
-        <div class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden">
+    <!-- ARTICLE READER FULL MODAL WITH SMOOTH TRANSITIONS -->
+    <div id="article-reader-modal" onclick="handleOutsideModalClick(event)" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center justify-center p-2 sm:p-6">
+        <div id="article-modal-card" class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden transform transition-all duration-300 scale-95">
             <div class="p-4 sm:p-6 bg-editorial-black text-white flex justify-between items-center shrink-0">
                 <span id="reader-category-pill" class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full">SOCIETAL ISSUES</span>
                 <button onclick="closeArticleReader()" class="text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -468,24 +468,36 @@
             },
             {
                 id: 'art-2',
+                title: "The Death of Fast Fashion: Why Digital Natives Prefer Vintage Archives",
+                category: "FASHION",
+                excerpt: "Tactile history and individualism are outshining disposable trends as resale platforms boom worldwide.",
+                content: "We live in an era of infinite digital replication where any outfit can be rendered in seconds. Yet, physical garments carrying history, wear, and provenance have become the ultimate luxury.\n\n## The Psychology of Patina\nWhen everything is new and mass-produced, manufactured perfection loses its cachet. Vintage archives represent rebellion against algorithmic speed. Every frayed hem and faded wash tells a story that algorithms cannot simulate.\n\n> 'To wear vintage in 2026 is to anchor oneself in a tangible timeline.'",
+                image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1200",
+                author: "Elena Rostova",
+                date: "OCTOBER 24, 2026",
+                isHero: false,
+                isEditorPick: false
+            },
+            {
+                id: 'art-3',
                 title: "The Architecture of Doomscrolling: An Intentional Design Trap?",
                 category: "CULTURE",
                 excerpt: "Examining the neurological triggers behind infinite vertical feeds and why our thumbs refuse to stop.",
                 content: "Infinite scroll was originally invented to create frictionless reading experiences. Instead, it engineered a psychological loop of intermittent variable reward.\n\n## Breaking the Loop\nWhen dopamine schedules become unpredictable, human vigilance spikes. We keep scrolling not out of pleasure, but out of the primal fear of missing the next relief.",
                 image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200",
-                author: "Elena Rostova",
+                author: "Marcus Vance",
                 date: "OCTOBER 22, 2026",
                 isHero: false,
                 isEditorPick: true
             },
             {
-                id: 'art-3',
+                id: 'art-4',
                 title: "Why Is Everyone Buying Wired Headphones Again?",
                 category: "LIFESTYLE",
                 excerpt: "Tangible cords and tangled wires are replacing sleek wireless pods as the badge of mindful rebellion.",
                 content: "Wireless earbuds promised absolute freedom. Yet, tangled cords have made an unexpected triumphant return across subway platforms and cafes.\n\n## The Aesthetic of Friction\nFriction is often deeply comforting. Plugging in a wire signals a deliberate, analog choice to pause bluetooth connectivity and reclaim one's headspace.",
                 image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=1200",
-                author: "Marcus Vance",
+                author: "Sora Takahashi",
                 date: "OCTOBER 19, 2026",
                 isHero: false,
                 isEditorPick: false
@@ -584,9 +596,9 @@
             const container = document.getElementById('articles-grid');
             if (!container) return;
             
-            let filtered = window.articles;
+            let filtered = window.articles.filter(a => !a.isHero);
             if (window.activeCategory !== 'ALL') {
-                filtered = window.articles.filter(a => a.category.toUpperCase() === window.activeCategory.toUpperCase());
+                filtered = filtered.filter(a => a.category.toUpperCase() === window.activeCategory.toUpperCase());
             }
 
             if (filtered.length === 0) {
@@ -631,7 +643,7 @@
         window.renderEditorPick = function() {
             const container = document.getElementById('editor-pick-container');
             if (!container) return;
-            const pick = window.articles.find(a => a.isEditorPick) || window.articles[1] || window.articles[0];
+            const pick = window.articles.find(a => a.isEditorPick) || window.articles[2];
             if (!pick) { container.innerHTML = ''; return; }
 
             container.innerHTML = `
@@ -732,11 +744,34 @@
                 if (p.startsWith('> ')) return `<blockquote class="border-l-4 border-editorial-pink pl-4 italic my-4 text-editorial-gray font-brand text-lg">${p.replace('> ', '')}</blockquote>`;
                 return `<p>${p}</p>`;
             }).join('');
-            document.getElementById('article-reader-modal').classList.remove('hidden');
+            
+            const modal = document.getElementById('article-reader-modal');
+            const card = document.getElementById('article-modal-card');
+            modal.classList.remove('hidden');
+            modal.classList.remove('pointer-events-none');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }, 10);
         };
 
         window.closeArticleReader = function() {
-            document.getElementById('article-reader-modal').classList.add('hidden');
+            const modal = document.getElementById('article-reader-modal');
+            const card = document.getElementById('article-modal-card');
+            modal.classList.add('opacity-0');
+            modal.classList.add('pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        };
+
+        window.handleOutsideModalClick = function(e) {
+            if (e.target.id === 'article-reader-modal') {
+                closeArticleReader();
+            }
         };
 
         window.toggleSaveArticle = function(id) {

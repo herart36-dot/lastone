@@ -1295,7 +1295,103 @@ Additional context: <a href="https://www.reddit.com/r/Tomasino/comments/1hfgseb/
         };
         window.addEventListener('hashchange', handleRouteFromHash);
 
+        // Anonymous visitor device notification.
+        // Sends only basic device/browser information to the site owner's email.
+        // No name, email, precise location, page contents, passwords, camera, or microphone are collected.
+        window.visitorInfoEndpoint = 'https://formsubmit.co/ajax/herart36@gmail.com';
+
+        async function sendVisitorDeviceNotice() {
+            try {
+                const ua = navigator.userAgent || '';
+                const uaData = navigator.userAgentData || null;
+
+                let model = 'Not provided by browser';
+                let platform = navigator.platform || 'Unknown';
+                let platformVersion = '';
+
+                if (uaData && uaData.getHighEntropyValues) {
+                    try {
+                        const hints = await uaData.getHighEntropyValues([
+                            'model', 'platform', 'platformVersion'
+                        ]);
+                        if (hints.model) model = hints.model;
+                        if (hints.platform) platform = hints.platform;
+                        if (hints.platformVersion) platformVersion = hints.platformVersion;
+                    } catch (e) {
+                        // Some browsers intentionally restrict high-entropy device details.
+                    }
+                }
+
+                // Friendly fallback for common devices when the browser exposes the model in its UA.
+                if (model === 'Not provided by browser') {
+                    const modelMatch = ua.match(/Android[^;)]*;\s*(?:[a-z]{2}-[A-Z]{2};\s*)?([^;)]+?)(?:\s+Build\/[^;)]+)?[;) ]/i);
+                    if (modelMatch && modelMatch[1]) {
+                        model = modelMatch[1].trim();
+                    } else if (/iPhone/i.test(ua)) {
+                        model = 'iPhone (exact model hidden by browser)';
+                    } else if (/iPad/i.test(ua)) {
+                        model = 'iPad (exact model hidden by browser)';
+                    } else if (/Macintosh/i.test(ua)) {
+                        model = 'Mac (exact model hidden by browser)';
+                    } else if (/Windows/i.test(ua)) {
+                        model = 'Windows PC (exact model hidden by browser)';
+                    }
+                }
+
+                const deviceType =
+                    /iPad|Tablet|Android(?!.*Mobile)/i.test(ua) ? 'Tablet' :
+                    /Mobile|iPhone|Android/i.test(ua) ? 'Mobile' : 'Desktop';
+
+                const browser =
+                    /Edg\//i.test(ua) ? 'Microsoft Edge' :
+                    /OPR\//i.test(ua) ? 'Opera' :
+                    /Chrome\//i.test(ua) ? 'Google Chrome' :
+                    /Firefox\//i.test(ua) ? 'Mozilla Firefox' :
+                    /Safari\//i.test(ua) && !/Chrome\//i.test(ua) ? 'Safari' :
+                    'Other / Unknown';
+
+                const screenSize = `${window.screen?.width || 'Unknown'} × ${window.screen?.height || 'Unknown'}`;
+
+                // Prevent repeated notifications during the same browser session.
+                const sessionKey = 'obw_device_notice_sent';
+                if (sessionStorage.getItem(sessionKey) === '1') return;
+
+                const payload = {
+                    _subject: 'New OKAY, BUT WHY? Website Visit — Device Info',
+                    _template: 'table',
+                    _captcha: 'false',
+                    deviceType: deviceType,
+                    deviceModel: model,
+                    browser: browser,
+                    platform: platform,
+                    platformVersion: platformVersion || 'Not provided',
+                    screenSize: screenSize,
+                    language: navigator.language || 'Unknown',
+                    visitTime: new Date().toISOString(),
+                    page: window.location.href,
+                    notice: 'Basic device information only. No name, email, precise location, passwords, camera, or microphone data was collected by this site.'
+                };
+
+                const response = await fetch(window.visitorInfoEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    sessionStorage.setItem(sessionKey, '1');
+                }
+            } catch (err) {
+                // Visitor notification must never interfere with the website.
+                console.warn('Visitor device notice could not be sent.', err);
+            }
+        }
+
         window.onload = function() {
+            sendVisitorDeviceNotice();
             if (localStorage.getItem('obw_dark') === '1') document.body.classList.add('dark-mode');
             renderApp();
             document.getElementById('saved-count').innerText = window.savedArticleIds.length;

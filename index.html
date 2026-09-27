@@ -744,6 +744,8 @@
                 card.classList.remove('scale-95');
                 card.classList.add('scale-100');
             }, 10);
+
+            history.replaceState(null, '', '#article/' + id);
         };
 
         window.renderReactions = function(id) {
@@ -780,7 +782,7 @@
         window.shareArticle = function(id) {
             const art = window.articles.find(a => a.id === id);
             if (!art) return;
-            const shareUrl = window.location.href.split('#')[0] + '#' + art.id;
+            const shareUrl = window.location.href.split('#')[0] + '#article/' + art.id;
             const shareData = { title: art.title, text: art.excerpt, url: shareUrl };
             if (navigator.share) {
                 navigator.share(shareData).catch(() => {});
@@ -816,6 +818,10 @@
             card.classList.remove('scale-100');
             card.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
+            window.currentReaderId = null;
+            if (window.location.hash.startsWith('#article/')) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
         };
 
         window.handleOutsideModalClick = function(e) {
@@ -912,9 +918,18 @@
         });
 
         window.handleRouteFromHash = function() {
-            const match = window.location.hash.match(/^#\/category\/(.+)$/);
-            if (match) {
-                const cat = decodeURIComponent(match[1]).toUpperCase();
+            const hash = window.location.hash;
+            const articleMatch = hash.match(/^#article\/(.+)$/);
+            if (articleMatch) {
+                const id = decodeURIComponent(articleMatch[1]);
+                if (window.articles.find(a => a.id === id)) {
+                    openArticleReader(id);
+                    return;
+                }
+            }
+            const categoryMatch = hash.match(/^#\/category\/(.+)$/);
+            if (categoryMatch) {
+                const cat = decodeURIComponent(categoryMatch[1]).toUpperCase();
                 if (window.siteBranding.categories.includes(cat)) {
                     filterCategory(cat);
                     return;
@@ -931,7 +946,7 @@
                 const form = document.getElementById('newsletter-form');
                 if (form) form.innerHTML = `<div class="flex items-center gap-2 text-editorial-black bg-editorial-lime/40 border-2 border-editorial-border rounded-lg px-3 py-2.5"><i class="fa-solid fa-circle-check text-editorial-pink"></i><span class="text-xs font-mono font-bold">SUBSCRIBED — WELCOME ABOARD</span></div>`;
             }
-            if (window.location.hash.startsWith('#/category/')) {
+            if (window.location.hash.startsWith('#/category/') || window.location.hash.startsWith('#article/')) {
                 handleRouteFromHash();
             }
         };

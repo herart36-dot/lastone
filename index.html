@@ -121,6 +121,57 @@
         .sticker-badge:hover {
             transform: rotate(0deg) scale(1.04);
         }
+        #reading-progress-track {
+            height: 3px;
+            background: rgba(255,255,255,0.15);
+        }
+        #reading-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #CCFF00;
+            transition: width 0.1s linear;
+        }
+        .reaction-btn {
+            transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .reaction-btn:hover {
+            transform: translateY(-2px);
+        }
+        .reaction-btn.is-active {
+            background-color: #FF0055 !important;
+            border-color: #FF0055 !important;
+            color: #fff !important;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.35); }
+            100% { transform: scale(1); }
+        }
+        .reaction-pop {
+            animation: pop 0.35s ease;
+        }
+        #scroll-top-btn {
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        #scroll-top-btn.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .kbd {
+            font-family: 'Space Grotesk', monospace;
+            border: 1px solid currentColor;
+            border-radius: 4px;
+            padding: 0px 5px;
+            font-size: 10px;
+        }
+        .newsletter-input:focus {
+            outline: none;
+            border-color: #FF0055;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-editorial-pink selection:text-white">
@@ -140,6 +191,9 @@
                 <span class="hidden sm:inline-block tracking-wider">GLOBAL DIGITAL EDITION</span>
             </div>
             <div class="flex items-center gap-3 sm:gap-5">
+                <button onclick="surpriseMe()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer items-center gap-1.5 hidden sm:flex" title="Open a random inquiry">
+                    <i class="fa-solid fa-dice text-xs"></i> <span>SURPRISE ME</span>
+                </button>
                 <button onclick="openSearchModal()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer flex items-center gap-1.5">
                     <i class="fa-solid fa-magnifying-glass text-xs"></i> <span class="hidden sm:inline">SEARCH</span>
                 </button>
@@ -175,6 +229,7 @@
     </header>
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 space-y-8">
+      <div id="home-view" class="space-y-8">
         <!-- BURNING QUESTION BANNER -->
         <section onclick="openBurningQuestionAnswer()" class="bg-editorial-black text-white p-4 sm:p-6 border-3 sm:border-4 border-editorial-border shadow-neo-lg rounded-2xl relative overflow-hidden group transition-all duration-300 cursor-pointer hover:border-editorial-pink">
             <div class="absolute -right-10 -bottom-10 w-40 h-40 sm:w-60 sm:h-60 bg-editorial-pink/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -242,16 +297,38 @@
                     </div>
                 </div>
 
-                <div class="bg-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4">
+                <div id="newsletter-card" class="bg-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4">
                     <div class="space-y-1">
                         <h4 class="font-brand text-xl font-extrabold uppercase text-editorial-black">THE THOMASIAN</h4>
                         <p class="text-xs text-editorial-gray font-sans">
                             Get our weekly deep-dive editorial breakdown delivered straight to your inbox every Sunday morning.
                         </p>
                     </div>
+                    <form id="newsletter-form" onsubmit="handleNewsletterSubmit(event)" class="space-y-2">
+                        <input type="email" id="newsletter-email" required placeholder="your@email.com" class="newsletter-input w-full px-3 py-2 bg-editorial-cream border-2 border-editorial-border rounded-lg text-base sm:text-xs font-mono text-editorial-black transition-colors">
+                        <button type="submit" class="w-full bg-editorial-black hover:bg-editorial-pink text-white text-[11px] font-mono font-bold uppercase px-3 py-2.5 rounded-lg cursor-pointer shadow-neo transition-colors">
+                            SUBSCRIBE
+                        </button>
+                    </form>
                 </div>
             </aside>
         </div>
+      </div>
+
+      <!-- DEDICATED CATEGORY PAGE -->
+      <div id="category-view" class="hidden space-y-6">
+        <button onclick="goHome()" class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase text-editorial-gray hover:text-editorial-pink transition-colors cursor-pointer">
+            <i class="fa-solid fa-arrow-left"></i> BACK TO ALL INQUIRIES
+        </button>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b-2 border-editorial-border pb-4">
+            <div class="space-y-1">
+                <span class="text-[10px] font-mono font-bold text-editorial-pink uppercase tracking-widest">SECTION</span>
+                <h2 id="category-view-title" class="font-display text-3xl sm:text-4xl font-extrabold uppercase text-editorial-black leading-none">FASHION</h2>
+            </div>
+            <span id="category-view-count" class="font-mono text-xs font-bold text-editorial-black bg-editorial-cream px-3 py-1.5 border-2 border-editorial-border rounded-full shrink-0">0 INQUIRIES</span>
+        </div>
+        <div id="category-view-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
     </main>
 
     <!-- FULL RESTORED FOOTER -->
@@ -310,11 +387,21 @@
     <!-- ARTICLE READER FULL MODAL -->
     <div id="article-reader-modal" onclick="handleOutsideModalClick(event)" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center justify-center p-2 sm:p-6">
         <div id="article-modal-card" class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden transform transition-all duration-300 scale-95">
+            <div id="reading-progress-track" class="w-full shrink-0"><div id="reading-progress-bar"></div></div>
             <div class="p-4 sm:p-6 bg-editorial-black text-white flex justify-between items-center shrink-0">
-                <span id="reader-category-pill" class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full">SOCIETAL ISSUES</span>
-                <button onclick="closeArticleReader()" class="text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <div class="flex items-center gap-3">
+                    <span id="reader-category-pill" class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full">SOCIETAL ISSUES</span>
+                    <span id="reader-read-time" class="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-gray-400"><i class="fa-solid fa-clock"></i> 3 MIN READ</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="shareArticle(window.currentReaderId)" title="Share this inquiry" class="text-gray-400 hover:text-editorial-lime text-lg cursor-pointer"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+                    <button onclick="toggleSaveArticle(window.currentReaderId)" title="Save this inquiry" class="text-gray-400 hover:text-editorial-pink text-lg cursor-pointer">
+                        <i id="reader-save-icon" class="fa-bookmark fa-regular"></i>
+                    </button>
+                    <button onclick="closeArticleReader()" class="text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
-            <div class="p-6 sm:p-10 overflow-y-auto custom-scrollbar space-y-6 flex-grow">
+            <div id="reader-scroll-area" class="p-6 sm:p-10 overflow-y-auto custom-scrollbar space-y-6 flex-grow">
                 <div class="space-y-3 max-w-2xl mx-auto">
                     <h1 id="reader-title" class="font-display text-2xl sm:text-4xl font-extrabold uppercase leading-tight">Title</h1>
                     <div class="flex items-center gap-4 font-mono text-xs text-editorial-gray">
@@ -327,6 +414,10 @@
                     <img id="reader-image" src="" alt="UST Campus Manila" class="w-full h-auto max-h-[500px] object-cover">
                 </div>
                 <div id="reader-body" class="max-w-2xl mx-auto font-sans text-sm sm:text-base leading-relaxed space-y-4 text-editorial-black"></div>
+                <div class="max-w-2xl mx-auto pt-4 border-t-2 border-editorial-border space-y-3">
+                    <span class="text-[10px] font-mono font-bold uppercase text-editorial-gray">What's your take?</span>
+                    <div id="reader-reactions" class="flex flex-wrap gap-2"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -337,11 +428,24 @@
         <span id="toast-message">Action successful</span>
     </div>
 
+    <!-- SCROLL TO TOP -->
+    <button id="scroll-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Back to top" class="fixed bottom-6 left-6 z-40 bg-editorial-black hover:bg-editorial-pink text-white w-11 h-11 rounded-full border-2 border-editorial-border shadow-neo flex items-center justify-center cursor-pointer">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
     <script>
         const ustCampusPhotoUrl = "https://images.unsplash.com/photo-1590012314607-cda9d9b699ae?auto=format&fit=crop&q=80&w=1200";
 
         window.activeCategory = 'ALL';
         window.savedArticleIds = JSON.parse(localStorage.getItem('obw_saved') || '[]');
+        window.currentReaderId = null;
+        window.articleReactions = JSON.parse(localStorage.getItem('obw_reactions') || '{}');
+        window.userReactions = JSON.parse(localStorage.getItem('obw_user_reactions') || '{}');
+        window.reactionTypes = [
+            { key: 'agree', emoji: '💡', label: 'Agree' },
+            { key: 'mindblown', emoji: '🤯', label: 'Mind Blown' },
+            { key: 'disagree', emoji: '👎', label: 'Disagree' }
+        ];
 
         window.siteBranding = {
             categories: ["ALL", "FASHION", "LIFESTYLE", "SOCIETAL ISSUES", "CULTURE"]
@@ -399,6 +503,18 @@
             }
         ];
 
+        window.defaultReactionSeeds = { 'art-1': { agree: 61, mindblown: 22, disagree: 9 }, 'art-2': { agree: 34, mindblown: 12, disagree: 4 }, 'art-3': { agree: 45, mindblown: 30, disagree: 6 } };
+        window.articles.forEach(a => {
+            if (!window.articleReactions[a.id]) {
+                window.articleReactions[a.id] = window.defaultReactionSeeds[a.id] || { agree: 12, mindblown: 5, disagree: 2 };
+            }
+        });
+
+        window.getReadingTime = function(content) {
+            const words = content.trim().split(/\s+/).length;
+            return Math.max(1, Math.round(words / 200));
+        };
+
         window.renderApp = function() {
             renderCategoryTabs();
             renderHeroStory();
@@ -419,10 +535,17 @@
         };
 
         window.filterCategory = function(cat) {
+            if (cat === 'ALL') {
+                goHome();
+                return;
+            }
             window.activeCategory = cat;
-            document.getElementById('active-category-label').innerText = `CATEGORY: ${cat}`;
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('category-view').classList.remove('hidden');
+            renderCategoryPage(cat);
             renderCategoryTabs();
-            renderArticlesGrid();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            history.replaceState(null, '', '#/category/' + encodeURIComponent(cat.toLowerCase()));
         };
 
         window.renderTicker = function() {
@@ -452,9 +575,10 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                         <div class="lg:col-span-7 space-y-4">
-                            <div class="flex items-center gap-2 font-mono text-xs">
+                            <div class="flex items-center gap-2 font-mono text-xs flex-wrap">
                                 <span class="bg-editorial-pink text-white font-bold uppercase px-3 py-1 rounded-full sticker-badge">${hero.category}</span>
                                 <span class="text-editorial-gray font-semibold">• ${hero.date}</span>
+                                <span class="text-editorial-gray font-semibold">• ${getReadingTime(hero.content)} MIN READ</span>
                             </div>
                             <h2 onclick="openArticleReader('${hero.id}')" class="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase text-editorial-black hover:text-editorial-pink transition-colors cursor-pointer leading-tight">
                                 ${hero.title}
@@ -477,15 +601,8 @@
             `;
         };
 
-        window.renderArticlesGrid = function() {
-            const container = document.getElementById('articles-grid');
-            if (!container) return;
-            let filtered = window.articles.filter(a => !a.isHero);
-            if (window.activeCategory !== 'ALL') {
-                filtered = filtered.filter(a => a.category.toUpperCase() === window.activeCategory.toUpperCase());
-            }
-
-            container.innerHTML = filtered.map(art => `
+        window.renderArticleCardHTML = function(art) {
+            return `
                 <div class="bg-white border-3 border-editorial-border p-5 shadow-neo rounded-2xl flex flex-col justify-between space-y-4 relative group hover:-translate-y-1 transition-all">
                     <div class="space-y-3">
                         <div class="overflow-hidden rounded-xl border-2 border-editorial-border h-48 cursor-pointer bg-white flex items-center justify-center" onclick="openArticleReader('${art.id}')">
@@ -497,6 +614,10 @@
                         </h3>
                         <p class="text-xs text-editorial-gray font-sans line-clamp-2">${art.excerpt}</p>
                     </div>
+                    <div class="flex items-center gap-3 text-[10px] font-mono text-editorial-gray">
+                        <span><i class="fa-solid fa-clock"></i> ${getReadingTime(art.content)} MIN</span>
+                        <span><i class="fa-solid fa-comment-dots"></i> ${Object.values(window.articleReactions[art.id] || {}).reduce((a,b) => a+b, 0)} REACTIONS</span>
+                    </div>
                     <div class="pt-3 border-t border-editorial-border/20 flex items-center justify-between text-xs font-mono">
                         <span class="font-bold">BY ${art.author.toUpperCase()}</span>
                         <button onclick="openArticleReader('${art.id}')" class="font-bold text-editorial-pink hover:underline uppercase flex items-center gap-1 cursor-pointer">
@@ -504,7 +625,36 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+        };
+
+        window.renderArticlesGrid = function() {
+            const container = document.getElementById('articles-grid');
+            if (!container) return;
+            const filtered = window.articles.filter(a => !a.isHero);
+            container.innerHTML = filtered.map(art => renderArticleCardHTML(art)).join('');
+        };
+
+        window.renderCategoryPage = function(cat) {
+            const titleEl = document.getElementById('category-view-title');
+            const countEl = document.getElementById('category-view-count');
+            const grid = document.getElementById('category-view-grid');
+            if (!titleEl || !grid) return;
+            const matches = window.articles.filter(a => a.category.toUpperCase() === cat.toUpperCase());
+            titleEl.innerText = cat;
+            countEl.innerText = `${matches.length} INQUIR${matches.length === 1 ? 'Y' : 'IES'}`;
+            grid.innerHTML = matches.length
+                ? matches.map(art => renderArticleCardHTML(art)).join('')
+                : `<p class="col-span-full text-sm font-mono text-editorial-gray py-10 text-center">No inquiries published in this section yet.</p>`;
+        };
+
+        window.goHome = function() {
+            window.activeCategory = 'ALL';
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('category-view').classList.add('hidden');
+            renderCategoryTabs();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            history.replaceState(null, '', window.location.pathname + window.location.search);
         };
 
         window.renderEditorPick = function() {
@@ -560,7 +710,9 @@
         window.openArticleReader = function(id) {
             const art = window.articles.find(a => a.id === id);
             if (!art) return;
+            window.currentReaderId = id;
             document.getElementById('reader-category-pill').innerText = art.category;
+            document.getElementById('reader-read-time').innerHTML = `<i class="fa-solid fa-clock"></i> ${getReadingTime(art.content)} MIN READ`;
             document.getElementById('reader-title').innerText = art.title;
             document.getElementById('reader-author').innerText = art.author.toUpperCase();
             document.getElementById('reader-date').innerText = art.date;
@@ -570,7 +722,20 @@
                 if (p.startsWith('> ')) return `<blockquote class="border-l-4 border-editorial-pink pl-4 italic my-4 text-editorial-gray font-brand text-lg">${p.replace('> ', '')}</blockquote>`;
                 return `<p>${p}</p>`;
             }).join('');
-            
+
+            const saveIcon = document.getElementById('reader-save-icon');
+            saveIcon.className = window.savedArticleIds.includes(id) ? 'fa-bookmark fa-solid text-editorial-pink' : 'fa-bookmark fa-regular';
+
+            renderReactions(id);
+
+            const scrollArea = document.getElementById('reader-scroll-area');
+            scrollArea.scrollTop = 0;
+            document.getElementById('reading-progress-bar').style.width = '0%';
+            scrollArea.onscroll = function() {
+                const pct = (scrollArea.scrollTop / (scrollArea.scrollHeight - scrollArea.clientHeight || 1)) * 100;
+                document.getElementById('reading-progress-bar').style.width = Math.min(100, Math.max(0, pct)) + '%';
+            };
+
             const modal = document.getElementById('article-reader-modal');
             const card = document.getElementById('article-modal-card');
             modal.classList.remove('hidden', 'pointer-events-none');
@@ -579,6 +744,69 @@
                 card.classList.remove('scale-95');
                 card.classList.add('scale-100');
             }, 10);
+        };
+
+        window.renderReactions = function(id) {
+            const container = document.getElementById('reader-reactions');
+            if (!container) return;
+            const counts = window.articleReactions[id] || {};
+            const userPick = window.userReactions[id];
+            container.innerHTML = window.reactionTypes.map(r => `
+                <button onclick="reactToArticle('${id}', '${r.key}')" class="reaction-btn flex items-center gap-2 bg-editorial-cream border-2 border-editorial-border rounded-full px-3 py-1.5 text-xs font-mono font-bold cursor-pointer ${userPick === r.key ? 'is-active' : ''}">
+                    <span>${r.emoji}</span> <span>${r.label}</span> <span class="opacity-70">${counts[r.key] || 0}</span>
+                </button>
+            `).join('');
+        };
+
+        window.reactToArticle = function(id, key) {
+            if (!window.articleReactions[id]) window.articleReactions[id] = { agree: 0, mindblown: 0, disagree: 0 };
+            const previous = window.userReactions[id];
+            if (previous === key) {
+                window.articleReactions[id][key] = Math.max(0, (window.articleReactions[id][key] || 0) - 1);
+                delete window.userReactions[id];
+            } else {
+                if (previous) window.articleReactions[id][previous] = Math.max(0, (window.articleReactions[id][previous] || 0) - 1);
+                window.articleReactions[id][key] = (window.articleReactions[id][key] || 0) + 1;
+                window.userReactions[id] = key;
+            }
+            localStorage.setItem('obw_reactions', JSON.stringify(window.articleReactions));
+            localStorage.setItem('obw_user_reactions', JSON.stringify(window.userReactions));
+            renderReactions(id);
+            const container = document.getElementById('reader-reactions');
+            container.classList.add('reaction-pop');
+            setTimeout(() => container.classList.remove('reaction-pop'), 350);
+        };
+
+        window.shareArticle = function(id) {
+            const art = window.articles.find(a => a.id === id);
+            if (!art) return;
+            const shareUrl = window.location.href.split('#')[0] + '#' + art.id;
+            const shareData = { title: art.title, text: art.excerpt, url: shareUrl };
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareUrl).then(() => showToast('Link copied to clipboard!'));
+            } else {
+                showToast('Copy this link: ' + shareUrl);
+            }
+        };
+
+        window.surpriseMe = function() {
+            const pool = window.articles;
+            const pick = pool[Math.floor(Math.random() * pool.length)];
+            openArticleReader(pick.id);
+            showToast('Here\'s a random deep-dive for you!');
+        };
+
+        window.handleNewsletterSubmit = function(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('newsletter-email');
+            const email = emailInput.value;
+            localStorage.setItem('obw_subscribed', email);
+            const card = document.getElementById('newsletter-card');
+            const form = document.getElementById('newsletter-form');
+            form.innerHTML = `<div class="flex items-center gap-2 text-editorial-black bg-editorial-lime/40 border-2 border-editorial-border rounded-lg px-3 py-2.5"><i class="fa-solid fa-circle-check text-editorial-pink"></i><span class="text-xs font-mono font-bold">SUBSCRIBED — WELCOME ABOARD</span></div>`;
+            showToast('Subscribed! Check your inbox Sunday morning.');
         };
 
         window.closeArticleReader = function() {
@@ -604,6 +832,11 @@
             localStorage.setItem('obw_saved', JSON.stringify(window.savedArticleIds));
             document.getElementById('saved-count').innerText = window.savedArticleIds.length;
             renderApp();
+            const saveIcon = document.getElementById('reader-save-icon');
+            if (saveIcon && window.currentReaderId) {
+                saveIcon.className = window.savedArticleIds.includes(window.currentReaderId) ? 'fa-bookmark fa-solid text-editorial-pink' : 'fa-bookmark fa-regular';
+            }
+            showToast(window.savedArticleIds.includes(id) ? 'Saved to your reading list!' : 'Removed from saved list.');
         };
 
         window.openSavedDrawer = function() {
@@ -659,9 +892,48 @@
             showToast("Submitted successfully to editorial team!");
         };
 
+        document.addEventListener('keydown', function(e) {
+            const tag = (document.activeElement && document.activeElement.tagName) || '';
+            const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+            if (e.key === 'Escape') {
+                closeArticleReader();
+                closeSearchModal();
+            } else if (e.key === '/' && !typing) {
+                e.preventDefault();
+                openSearchModal();
+            }
+        });
+
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById('scroll-top-btn');
+            if (!btn) return;
+            if (window.scrollY > 500) btn.classList.add('is-visible');
+            else btn.classList.remove('is-visible');
+        });
+
+        window.handleRouteFromHash = function() {
+            const match = window.location.hash.match(/^#\/category\/(.+)$/);
+            if (match) {
+                const cat = decodeURIComponent(match[1]).toUpperCase();
+                if (window.siteBranding.categories.includes(cat)) {
+                    filterCategory(cat);
+                    return;
+                }
+            }
+            goHome();
+        };
+        window.addEventListener('hashchange', handleRouteFromHash);
+
         window.onload = function() {
             renderApp();
             document.getElementById('saved-count').innerText = window.savedArticleIds.length;
+            if (localStorage.getItem('obw_subscribed')) {
+                const form = document.getElementById('newsletter-form');
+                if (form) form.innerHTML = `<div class="flex items-center gap-2 text-editorial-black bg-editorial-lime/40 border-2 border-editorial-border rounded-lg px-3 py-2.5"><i class="fa-solid fa-circle-check text-editorial-pink"></i><span class="text-xs font-mono font-bold">SUBSCRIBED — WELCOME ABOARD</span></div>`;
+            }
+            if (window.location.hash.startsWith('#/category/')) {
+                handleRouteFromHash();
+            }
         };
     </script>
 </body>

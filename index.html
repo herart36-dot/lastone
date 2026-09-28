@@ -469,19 +469,35 @@
         </section>
       <div id="home-view" class="space-y-8">
         <!-- BURNING QUESTION BANNER -->
-        <section onclick="openBurningQuestionAnswer()" class="bg-editorial-black text-white p-4 sm:p-6 border-3 sm:border-4 border-editorial-border shadow-neo-lg rounded-2xl relative overflow-hidden group transition-all duration-300 cursor-pointer hover:border-editorial-pink">
-            <div class="absolute -right-10 -bottom-10 w-40 h-40 sm:w-60 sm:h-60 bg-editorial-pink/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <div class="space-y-1.5 max-w-3xl">
-                    <div class="inline-flex items-center gap-1.5 bg-editorial-pink text-white font-mono text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full sticker-badge">
-                        <i class="fa-solid fa-fire text-editorial-lime animate-bounce"></i> TODAY'S BURNING QUESTION (CLICK FOR EDITORIAL ANSWER)
+        <section onclick="openBurningQuestionAnswer()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openBurningQuestionAnswer();}" tabindex="0" role="button" aria-label="Open today's burning question: Strict Professor or Just on a Power Trip?" class="relative group bg-[#0b0b0d] text-white p-4 sm:p-5 lg:p-6 border-3 sm:border-4 border-editorial-border shadow-neo-lg rounded-2xl overflow-hidden cursor-pointer outline-none transition-all duration-300 hover:-translate-y-1 hover:border-editorial-pink hover:shadow-[0_14px_0_#19191c,0_0_35px_rgba(255,0,102,.18)] focus:border-editorial-pink focus:ring-4 focus:ring-editorial-pink/20">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(255,0,102,.24),transparent_34%),radial-gradient(circle_at_15%_110%,rgba(183,255,0,.10),transparent_30%)] pointer-events-none"></div>
+            <div class="absolute -right-16 -top-20 w-52 h-52 rounded-full border-[18px] border-editorial-pink/10 transition-transform duration-700 group-hover:scale-125 group-hover:rotate-12 pointer-events-none"></div>
+            <div class="absolute right-5 bottom-2 text-[90px] sm:text-[120px] font-black leading-none text-white/[0.025] select-none pointer-events-none">?</div>
+            <div class="absolute left-0 top-0 h-1 w-0 bg-editorial-lime transition-all duration-500 group-hover:w-full pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5">
+                <div class="min-w-0 max-w-3xl">
+                    <div class="flex flex-wrap items-center gap-2 mb-2.5">
+                        <div class="inline-flex items-center gap-1.5 bg-editorial-pink text-white font-mono text-[9px] sm:text-[10px] font-bold uppercase px-2.5 py-1 rounded-full sticker-badge shadow-[3px_3px_0_rgba(255,255,255,.12)]">
+                            <i class="fa-solid fa-fire text-editorial-lime"></i> TODAY'S BURNING QUESTION
+                        </div>
+                        <span class="hidden sm:inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-white/50">
+                            <span class="w-1.5 h-1.5 rounded-full bg-editorial-lime animate-pulse"></span> EDITORIAL
+                        </span>
                     </div>
-                    <h2 class="font-brand text-lg sm:text-2xl lg:text-3xl font-extrabold text-white leading-tight">
+                    <h2 class="font-brand text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-[1.05] tracking-tight transition-transform duration-300 group-hover:translate-x-1">
                         "Strict Professor or Just on a Power Trip?"
                     </h2>
+                    <p class="mt-2 font-mono text-[10px] sm:text-xs uppercase tracking-wider text-white/55 max-w-2xl">
+                        A student question worth unpacking. Read the editorial perspective.
+                    </p>
                 </div>
-                <div class="shrink-0 font-mono text-xs text-editorial-lime font-bold uppercase flex items-center gap-1 bg-white/10 px-3 py-2 rounded-xl">
-                    VIEW ANSWER <i class="fa-solid fa-arrow-right"></i>
+                <div class="shrink-0 w-full lg:w-auto">
+                    <div class="inline-flex w-full lg:w-auto items-center justify-between gap-4 bg-editorial-lime text-editorial-black font-mono text-[10px] sm:text-xs font-black uppercase px-4 py-3 rounded-xl border-2 border-editorial-black shadow-[4px_4px_0_rgba(255,255,255,.12)] transition-all duration-300 group-hover:bg-white group-hover:translate-x-1 group-hover:-translate-y-0.5">
+                        <span>Read the answer</span>
+                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-editorial-black text-editorial-lime transition-transform duration-300 group-hover:translate-x-1">
+                            <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -810,10 +826,10 @@
         };
 
         window.tickerItems = [
-            "🔥 BURNING INQUIRY: STRICT PROFESSOR OR JUST ON A POWER TRIP?",
-            "✨ CULTURAL SHIFT: THE RETURN OF WIRED HEADPHONES AS STATUS SYMBOLS",
-            "⚡ NEW STORY: WHY ARE WE ADDICTED TO MICRO-DRAMAS AND AI DRAMAS?",
-            "⚡ NEW STORY: WHAT DOES THE NEW UST GATE 6 GRAFFITI SAY ABOUT PUBLIC SPACE?"
+            "🔥 HOT TAKE: WHY DO WE KEEP CHASING THINGS THAT DO NOT MAKE US HAPPY?",
+            "✨ CULTURE WATCH: THE TRENDS CHANGING HOW GEN Z SEES IDENTITY",
+            "⚡ NEW STORY: WHY DO SMALL DRAMAS FEEL SO BIG ONLINE?",
+            "⚡ NEW STORY: THE QUESTIONS WE ASK WHEN NOBODY HAS A SIMPLE ANSWER"
         ];
 
         window.radarPoll = {
@@ -884,6 +900,7 @@
                     "content": "When does “high standards” stop being good teaching and start feeling like an ego trip?\n\nEvery student has met that professor.\n\nThe one whose name alone makes the class go silent.\n\nStrict rules. Endless recitations. Brutal exams. Somehow, one question turns into a 15-minute interrogation.\n\nBut here’s the real question: Does being strict actually make students learn better?\n\n## Strict Isn’t the Problem\nHigh standards aren’t the issue. Deadlines, readings, and challenging questions are part of college.\n\nFor example, in a Political Science recitation, follow-up questions can help test whether a student really understands their answer.\n\nBut when the questioning keeps going just to embarrass someone in front of the class, it stops feeling like teaching and starts feeling like humiliation.\n\n## When Rules Become Too Much\nNo late submissions. No phones. No excuses.\n\nRules can create discipline, but when every small mistake becomes a big offense, students start wondering if the goal is learning—or just showing who’s in charge.\n\n## The “Did We Even Study This?” Exam\nHard exams are fair if they test what students learned.\n\nBut questions that go way beyond the readings or discussions can make students feel like they’re being set up to fail instead of being assessed.\n\n## The Boring Lecture Problem\nStudents are told to think critically, yet some classes become the same cycle:\n\nProfessor talks. Students take notes. Repeat.\n\nTraditional lectures have their place, but learning feels different when students are actually invited to discuss and question ideas.\n\n## So, Strict or Power Trip?\nThe problem isn’t strictness—it’s the purpose behind it.\n\nChallenge students. Give fair but difficult exams. Expect effort.\n\n> 'If teaching relies on humiliation, unnecessary rules, or making students struggle just to prove authority, it’s worth asking: Is this really about education, or is it about ego?'\n\nThe best professors aren’t the ones students fear the most. They’re the ones who challenge students without making them hate learning.",
                     "image": "https://cdn.phototourl.com/member/2026-09-28-4d56d0e8-d31e-43c5-bcc1-058f6e049b30.jpg",
                     "author": "Unidentified Thomasian",
+                    "isEditorPick": true,
                     "date": "SEPTEMBER 27, 2026",
                     "isHero": false,
                     "isEditorPick": false,
@@ -1134,7 +1151,7 @@
         window.renderEditorPick = function() {
             const container = document.getElementById('editor-pick-container');
             if (!container) return;
-            const pick = window.articles.find(a => a.isEditorPick) || window.articles[1];
+            const pick = window.articles.find(a => a.id === "art-1");
             container.innerHTML = `
                 <div class="bg-editorial-black text-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4">
                     <span class="bg-editorial-lime text-editorial-black text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full">EDITOR'S CHOICE</span>
@@ -1177,7 +1194,9 @@
         };
 
         window.openBurningQuestionAnswer = function() {
-            const art = window.articles[0];
+            // Today's Burning Question is specifically linked to the Strict Professor article.
+            const art = window.articles.find(a => a.id === "art-1");
+            if (!art) return;
             openArticleReader(art.id);
         };
 

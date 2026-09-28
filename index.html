@@ -1271,7 +1271,10 @@
         window.shareArticle = function(id) {
             const art = window.articles.find(a => a.id === id);
             if (!art) return;
-            const shareUrl = window.location.href.split('#')[0] + '#article/' + art.id;
+            // Use a clean, article-specific query URL for sharing. This preserves the article ID
+            // without relying on a URL hash, which social crawlers such as Facebook ignore.
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = baseUrl + '?article=' + encodeURIComponent(art.id);
             window.shareState = { id, url: shareUrl, title: art.title, text: art.excerpt || 'Read this story from OKAY, BUT WHY?' };
             const titleEl = document.getElementById('share-modal-title');
             if (titleEl) titleEl.textContent = art.title;
@@ -1750,6 +1753,23 @@
                 console.warn('Visitor device notice could not be sent.', err);
             }
         }
+
+        // Open an article from a shared ?article=ID URL.
+        (function handleSharedArticleUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const sharedId = params.get('article');
+            if (!sharedId) return;
+            const openShared = () => {
+                if (window.articles && window.articles.some(a => a.id === sharedId)) {
+                    window.openArticleReader(sharedId);
+                }
+            };
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => setTimeout(openShared, 50), { once: true });
+            } else {
+                setTimeout(openShared, 50);
+            }
+        })();
 
         window.onload = function() {
             if (localStorage.getItem('obw_dark') === '1') document.body.classList.add('dark-mode');

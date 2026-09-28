@@ -18,6 +18,10 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="OKAY, BUT WHY? | UST Graffiti, Modern Culture & Societal Issues">
     <meta name="twitter:description" content="A digital journal exploring modern phenomena, UST graffiti, Manila street culture, fashion, lifestyle, societal issues, internet culture, and contemporary trends.">
+    <meta property="og:image" content="" id="meta-og-image">
+    <meta property="og:image:alt" content="OKAY, BUT WHY? journal cover" id="meta-og-image-alt">
+    <meta property="og:url" content="" id="meta-og-url">
+    <meta name="twitter:image" content="" id="meta-twitter-image">
     <!-- Add your live website URL below once the site is published. -->
     <!-- <link rel="canonical" href="https://your-domain.com/"> -->
 
@@ -325,6 +329,72 @@
         #dark-toggle .fa-sun { display: none; }
         body.dark-mode #dark-toggle .fa-sun { display: inline-block; }
         body.dark-mode #dark-toggle .fa-moon { display: none; }
+
+        /* ---- COPY SUCCESS + SHARE PREVIEW ---- */
+        #toast-notification {
+            left: 50%;
+            right: auto;
+            bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+            transform: translateX(-50%) translateY(16px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease, transform 0.28s cubic-bezier(.2,.8,.2,1);
+            max-width: min(92vw, 420px);
+            width: max-content;
+            z-index: 80;
+        }
+        #toast-notification.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        #toast-notification.is-success {
+            background: #0D0D0D;
+            border-color: #CCFF00;
+            box-shadow: 4px 4px 0 0 #CCFF00;
+        }
+        #toast-notification .toast-icon {
+            width: 28px; height: 28px; min-width: 28px;
+            border-radius: 9999px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #CCFF00; color: #0D0D0D; font-size: 13px;
+        }
+        #toast-notification .toast-icon.is-check { animation: toast-pop 0.45s cubic-bezier(.2,.8,.2,1); }
+        @keyframes toast-pop {
+            0% { transform: scale(0.6); opacity: 0.4; }
+            55% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        #copy-link-btn.is-copied {
+            background: #CCFF00 !important;
+            color: #0D0D0D !important;
+            border-color: #0D0D0D !important;
+        }
+        #copy-link-btn.is-copied i { color: #0D0D0D; }
+        #share-preview-card {
+            border: 2px solid #18181B;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #fff;
+        }
+        body.dark-mode #share-preview-card { background: #17171A; border-color: #3a3a3f; }
+        #share-preview-tags span {
+            display: inline-block;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            border: 1px solid #18181B;
+            background: #FAF8F5;
+            color: #0D0D0D;
+            margin: 2px 3px 0 0;
+        }
+        body.dark-mode #share-preview-tags span {
+            background: #222226; color: #FAF8F5; border-color: #3a3a3f;
+        }
     </style>
 
     <script type="application/ld+json" id="ust-graffiti-article-schema">
@@ -729,6 +799,19 @@
                 <button onclick="closeShareModal()" class="modal-close-btn text-xl font-bold text-editorial-black cursor-pointer" aria-label="Close share menu"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
+            <!-- Live preview of what gets shared -->
+            <div id="share-preview-card" class="flex gap-3 items-stretch">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 shrink-0 overflow-hidden bg-editorial-sand">
+                    <img id="share-preview-image" src="" alt="" class="w-full h-full object-cover">
+                </div>
+                <div class="min-w-0 flex-1 py-1 pr-2">
+                    <span id="share-preview-category" class="text-[9px] font-mono font-bold uppercase tracking-widest text-editorial-pink"></span>
+                    <h4 id="share-preview-title" class="font-display text-sm font-extrabold uppercase leading-snug line-clamp-2 mt-0.5"></h4>
+                    <p id="share-preview-excerpt" class="text-[11px] text-editorial-gray line-clamp-2 mt-1 leading-snug"></p>
+                    <div id="share-preview-tags" class="mt-1.5 flex flex-wrap"></div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="shareArticleNative()" class="flex flex-col items-center justify-center gap-2 bg-editorial-black text-white border-2 border-editorial-border rounded-xl p-4 hover:bg-editorial-pink transition-colors cursor-pointer">
                     <i class="fa-solid fa-arrow-up-from-bracket text-xl"></i>
@@ -742,9 +825,9 @@
                     <i class="fa-brands fa-instagram text-xl"></i>
                     <span class="text-[10px] font-mono font-bold uppercase">Instagram / Stories</span>
                 </button>
-                <button onclick="copyArticleShareLink()" class="flex flex-col items-center justify-center gap-2 bg-white text-editorial-black border-2 border-editorial-border rounded-xl p-4 hover:bg-editorial-sand transition-colors cursor-pointer">
-                    <i class="fa-solid fa-link text-xl"></i>
-                    <span class="text-[10px] font-mono font-bold uppercase">Copy Link</span>
+                <button id="copy-link-btn" onclick="copyArticleShareLink()" class="flex flex-col items-center justify-center gap-2 bg-white text-editorial-black border-2 border-editorial-border rounded-xl p-4 hover:bg-editorial-sand transition-colors cursor-pointer">
+                    <i id="copy-link-icon" class="fa-solid fa-link text-xl"></i>
+                    <span id="copy-link-label" class="text-[10px] font-mono font-bold uppercase">Copy Link</span>
                 </button>
             </div>
 
@@ -797,8 +880,8 @@
     </div>
 
     <!-- TOAST -->
-    <div id="toast-notification" class="fixed bottom-6 right-6 bg-editorial-black text-white border-2 border-editorial-lime px-4 py-3 rounded-xl shadow-neo-lg z-50 hidden flex items-center gap-3 font-mono text-xs">
-        <span class="w-2.5 h-2.5 rounded-full bg-editorial-lime animate-ping"></span>
+    <div id="toast-notification" class="fixed bg-editorial-black text-white border-2 border-editorial-lime px-4 py-3.5 rounded-2xl shadow-neo-lg flex items-center gap-3 font-mono text-xs" role="status" aria-live="polite">
+        <span id="toast-icon" class="toast-icon" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
         <span id="toast-message">Action successful</span>
     </div>
 
@@ -1204,6 +1287,9 @@
             const art = window.articles.find(a => a.id === id);
             if (!art) return;
             window.currentReaderId = id;
+            // Keep page meta aligned with the open article (helps share previews & bookmarks)
+            const baseUrl = window.location.origin + window.location.pathname;
+            window.updateSocialMeta(art, baseUrl + '?article=' + encodeURIComponent(art.id));
             document.getElementById('reader-category-pill').innerText = art.category;
             document.getElementById('reader-read-time').innerHTML = `<i class="fa-solid fa-clock"></i> ${getReadingTime(art.content)} MIN READ`;
             document.getElementById('reader-title').innerText = art.title;
@@ -1266,7 +1352,37 @@
             setTimeout(() => container.classList.remove('reaction-pop'), 350);
         };
 
-        window.shareState = { id: null, url: '', title: '', text: '' };
+        window.shareState = { id: null, url: '', title: '', text: '', image: '', category: '', keywords: [] };
+
+        window.updateSocialMeta = function(art, shareUrl) {
+            if (!art) return;
+            const title = art.title + ' | OKAY, BUT WHY?';
+            const description = art.excerpt || 'Read this story from OKAY, BUT WHY?';
+            const image = art.image || '';
+            const url = shareUrl || (window.location.origin + window.location.pathname + '?article=' + encodeURIComponent(art.id));
+
+            document.title = title;
+
+            const setMeta = (selector, attr, value) => {
+                const el = document.querySelector(selector);
+                if (el && value) el.setAttribute(attr, value);
+            };
+            setMeta('meta[property="og:title"]', 'content', title);
+            setMeta('meta[property="og:description"]', 'content', description);
+            setMeta('meta[property="og:type"]', 'content', 'article');
+            setMeta('#meta-og-image', 'content', image);
+            setMeta('#meta-og-image-alt', 'content', art.title);
+            setMeta('#meta-og-url', 'content', url);
+            setMeta('meta[name="twitter:title"]', 'content', title);
+            setMeta('meta[name="twitter:description"]', 'content', description);
+            setMeta('#meta-twitter-image', 'content', image);
+            setMeta('meta[name="description"]', 'content', description);
+
+            // Keep keywords / tags available for clients that read them
+            if (Array.isArray(art.keywords) && art.keywords.length) {
+                setMeta('meta[name="keywords"]', 'content', art.keywords.join(', '));
+            }
+        };
 
         window.shareArticle = function(id) {
             const art = window.articles.find(a => a.id === id);
@@ -1275,9 +1391,51 @@
             // without relying on a URL hash, which social crawlers such as Facebook ignore.
             const baseUrl = window.location.origin + window.location.pathname;
             const shareUrl = baseUrl + '?article=' + encodeURIComponent(art.id);
-            window.shareState = { id, url: shareUrl, title: art.title, text: art.excerpt || 'Read this story from OKAY, BUT WHY?' };
+            const tags = Array.isArray(art.keywords) ? art.keywords.slice(0, 6) : [];
+            const tagLine = tags.length ? ' · ' + tags.map(t => '#' + String(t).replace(/\s+/g, '')).join(' ') : '';
+            const shareText = (art.excerpt || 'Read this story from OKAY, BUT WHY?') + tagLine;
+
+            window.shareState = {
+                id,
+                url: shareUrl,
+                title: art.title,
+                text: shareText,
+                image: art.image || '',
+                category: art.category || '',
+                keywords: tags
+            };
+
+            // Update Open Graph / Twitter meta so shared previews can show title, image & description
+            window.updateSocialMeta(art, shareUrl);
+
             const titleEl = document.getElementById('share-modal-title');
             if (titleEl) titleEl.textContent = art.title;
+
+            // Fill share preview card (highlight + picture + tags)
+            const imgEl = document.getElementById('share-preview-image');
+            const catEl = document.getElementById('share-preview-category');
+            const tEl = document.getElementById('share-preview-title');
+            const xEl = document.getElementById('share-preview-excerpt');
+            const tagsEl = document.getElementById('share-preview-tags');
+            if (imgEl) {
+                imgEl.src = art.image || '';
+                imgEl.alt = art.title || '';
+            }
+            if (catEl) catEl.textContent = art.category || '';
+            if (tEl) tEl.textContent = art.title || '';
+            if (xEl) xEl.textContent = art.excerpt || '';
+            if (tagsEl) {
+                tagsEl.innerHTML = tags.map(k => '<span>#' + String(k).replace(/\s+/g, '') + '</span>').join('');
+            }
+
+            // Reset copy button state
+            const copyBtn = document.getElementById('copy-link-btn');
+            const copyIcon = document.getElementById('copy-link-icon');
+            const copyLabel = document.getElementById('copy-link-label');
+            if (copyBtn) copyBtn.classList.remove('is-copied');
+            if (copyIcon) copyIcon.className = 'fa-solid fa-link text-xl';
+            if (copyLabel) copyLabel.textContent = 'Copy Link';
+
             const modal = document.getElementById('share-modal');
             if (modal) {
                 modal.classList.add('is-open');
@@ -1302,10 +1460,10 @@
                 try {
                     await navigator.share({ title, text, url });
                     closeShareModal();
+                    showToast('Shared successfully!', { success: true });
                 } catch (e) {}
             } else {
                 await copyArticleShareLink();
-                showToast('Link copied. You can paste it into Messages or Messenger.');
             }
         };
 
@@ -1323,32 +1481,49 @@
                 try {
                     await navigator.share({ title, text, url });
                     closeShareModal();
-                    showToast('Choose Instagram or Instagram Stories from your share menu if available.');
+                    showToast('Choose Instagram or Instagram Stories from your share menu if available.', { success: true });
                 } catch (e) {}
             } else {
                 await copyArticleShareLink();
                 window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
-                showToast('Link copied. Open Instagram and paste it where you want to share.');
             }
         };
 
         window.copyArticleShareLink = async function() {
             const { url } = window.shareState;
             if (!url) return;
+            const copyBtn = document.getElementById('copy-link-btn');
+            const copyIcon = document.getElementById('copy-link-icon');
+            const copyLabel = document.getElementById('copy-link-label');
+
             try {
-                if (navigator.clipboard) {
+                if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(url);
                 } else {
                     const temp = document.createElement('textarea');
                     temp.value = url;
+                    temp.setAttribute('readonly', '');
+                    temp.style.position = 'fixed';
+                    temp.style.left = '-9999px';
                     document.body.appendChild(temp);
                     temp.select();
                     document.execCommand('copy');
                     temp.remove();
                 }
-                showToast('Article link copied!');
+
+                if (copyBtn) copyBtn.classList.add('is-copied');
+                if (copyIcon) copyIcon.className = 'fa-solid fa-check text-xl';
+                if (copyLabel) copyLabel.textContent = 'Copied!';
+
+                showToast('Link copied — ready to paste!', { success: true, duration: 2800 });
+
+                setTimeout(() => {
+                    if (copyBtn) copyBtn.classList.remove('is-copied');
+                    if (copyIcon) copyIcon.className = 'fa-solid fa-link text-xl';
+                    if (copyLabel) copyLabel.textContent = 'Copy Link';
+                }, 2200);
             } catch (e) {
-                showToast('Copy this link: ' + url);
+                showToast('Copy this link: ' + url, { duration: 5000 });
             }
         };
 
@@ -1556,11 +1731,29 @@
             `).join('');
         };
 
-        window.showToast = function(msg) {
+        window._toastHideTimer = null;
+        window.showToast = function(msg, opts) {
+            opts = opts || {};
             const t = document.getElementById('toast-notification');
-            document.getElementById('toast-message').innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3500);
+            const msgEl = document.getElementById('toast-message');
+            const iconEl = document.getElementById('toast-icon');
+            if (!t || !msgEl) return;
+            msgEl.innerText = msg;
+            t.classList.toggle('is-success', !!opts.success);
+            if (iconEl) {
+                iconEl.innerHTML = opts.success
+                    ? '<i class="fa-solid fa-check"></i>'
+                    : '<i class="fa-solid fa-circle-info"></i>';
+                iconEl.classList.remove('is-check');
+                // retrigger animation
+                void iconEl.offsetWidth;
+                if (opts.success) iconEl.classList.add('is-check');
+            }
+            t.classList.add('is-visible');
+            if (window._toastHideTimer) clearTimeout(window._toastHideTimer);
+            window._toastHideTimer = setTimeout(() => {
+                t.classList.remove('is-visible');
+            }, opts.duration || 3500);
         };
 
         window.handleRadarPromptSubmit = function(e) {

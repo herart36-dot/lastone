@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OKAY, BUT WHY? — Editor</title>
+<style>
+:root{--pink:#ff0055;--lime:#ccff00;--black:#111;--cream:#f7f3ea;--gray:#777;--line:#ddd}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--black);font-family:Arial,Helvetica,sans-serif}.top{background:#111;color:#fff;padding:22px 18px;position:sticky;top:0;z-index:5}.top h1{margin:0;font-size:25px;letter-spacing:-1px}.top small{color:#ccc}.wrap{max-width:1050px;margin:auto;padding:20px}.card{background:#fff;border:2px solid #111;box-shadow:5px 5px 0 #111;padding:18px;margin-bottom:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}}label{display:block;font-size:12px;font-weight:800;text-transform:uppercase;margin-bottom:6px}input,select,textarea{width:100%;padding:12px;border:1px solid #999;border-radius:5px;font:inherit}textarea{min-height:260px;resize:vertical}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}button{border:2px solid #111;background:#fff;padding:11px 15px;font-weight:800;cursor:pointer}button.primary{background:var(--pink);color:#fff}button.lime{background:var(--lime)}button.danger{background:#111;color:#fff}.status{padding:10px;margin-top:12px;background:#f2f2f2;border-left:5px solid var(--pink);white-space:pre-wrap}.post{border:1px solid var(--line);padding:12px;margin:8px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}.post strong{display:block}.muted{color:var(--gray);font-size:13px}.pill{display:inline-block;border:1px solid #111;border-radius:99px;padding:3px 8px;font-size:11px;margin:2px}.help{font-size:13px;line-height:1.5}.warning{background:#fff4cf;border:1px solid #d8a900;padding:12px}.hidden{display:none}
+</style>
+</head>
+<body>
+<header class="top"><h1>OKAY, BUT WHY? — EDITOR</h1><small>Private publishing dashboard for your GitHub Pages website</small></header>
+<main class="wrap">
+<section class="card">
+<h2>1. Connect your website</h2>
+<p class="help">This editor publishes directly to your GitHub repository. Your token is kept only in this browser tab and is not saved by this page.</p>
+<div class="warning"><b>Security:</b> create a GitHub <b>fine-grained personal access token</b> limited to this one repository with <b>Contents: Read and write</b>. Never paste a token into your public website code.</div>
+<div class="grid" style="margin-top:12px">
+<div><label>GitHub username / owner</label><input id="owner" placeholder="yourusername"></div>
+<div><label>Repository</label><input id="repo" placeholder="okay-but-why"></div>
+<div><label>Branch</label><input id="branch" value="main"></div>
+<div><label>Website file</label><input id="path" value="index.html"></div>
+</div>
+<div style="margin-top:12px"><label>GitHub token</label><input id="token" type="password" placeholder="github_pat_..." autocomplete="off"></div>
+<div class="row"><button class="primary" id="connect">Connect & Load Articles</button><button id="clear">Clear</button></div>
+<div id="status" class="status">Not connected.</div>
+</section>
+
+<section class="card" id="editor" style="display:none">
+<h2>2. Write / edit article</h2>
+<input type="hidden" id="articleId">
+<div class="grid">
+<div><label>Title</label><input id="title"></div>
+<div><label>Category</label><select id="category"><option>FASHION</option><option>LIFESTYLE</option><option>SOCIETAL ISSUES</option><option>CULTURE</option></select></div>
+</div>
+<div style="margin-top:12px"><label>Excerpt</label><input id="excerpt"></div>
+<div class="grid" style="margin-top:12px">
+<div><label>Author</label><input id="author" value="OKAY, BUT WHY? JOURNAL"></div>
+<div><label>Date</label><input id="date" placeholder="SEPTEMBER 28, 2026"></div>
+</div>
+<div style="margin-top:12px"><label>Cover image URL</label><input id="image" placeholder="https://... or relative path"></div>
+<div style="margin-top:12px"><label>SEO keywords (comma separated)</label><input id="keywords"></div>
+<div style="margin-top:12px"><label>Article body</label><textarea id="content" placeholder="Write the article here. Use Markdown-style headings beginning with ## for sections."></textarea></div>
+<div class="row"><button class="lime" id="newPost">New Article</button><button class="primary" id="publish">Publish Changes</button><button class="danger" id="delete">Delete Article</button></div>
+</section>
+
+<section class="card" id="articlesBox" style="display:none"><h2>3. Published articles</h2><div id="articlesList"></div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let state={articles:[],sha:null};
+function msg(t,ok=false){$('status').textContent=t;$('status').style.borderLeftColor=ok?'#39a900':'#ff0055'}
+function cfg(){return {owner:$('owner').value.trim(),repo:$('repo').value.trim(),branch:$('branch').value.trim()||'main',path:$('path').value.trim()||'index.html',token:$('token').value.trim()}}
+async function gh(path,opts={}){const c=cfg();if(!c.owner||!c.repo||!c.token)throw Error('Enter your GitHub owner, repository and token first.');const r=await fetch('https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path+'?ref='+encodeURIComponent(c.branch),{...opts,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28',...(opts.headers||{})}});if(!r.ok)throw Error((await r.text()).slice(0,800));return r.json()}
+function decode(b){return decodeURIComponent(escape(atob(b.replace(/\n/g,''))))}
+function encode(s){return btoa(unescape(encodeURIComponent(s)))}
+function parseArticles(src){const m=src.match(/window\.articles\s*=\s*(\[[\s\S]*?\n\s*\]);/);if(!m)throw Error('Could not find window.articles in index.html.');try{const sandbox=new Proxy({}, {has:()=>true,get:()=>undefined});return Function('sandbox','with(sandbox){return '+m[1]+'}')(sandbox)}catch(e){throw Error('The article data in index.html could not be read: '+e.message)}}
+function replaceArticles(src,articles){const json=JSON.stringify(articles,null,12);return src.replace(/window\.articles\s*=\s*\[[\s\S]*?\n\s*\];/, 'window.articles = '+json+';')}
+function renderList(){const box=$('articlesList');box.innerHTML='';state.articles.forEach(a=>{const d=document.createElement('div');d.className='post';d.innerHTML='<div><strong>'+esc(a.title)+'</strong><span class="muted">'+esc(a.category||'')+' · '+esc(a.date||'')+'</span></div><button>Edit</button>';d.querySelector('button').onclick=()=>loadForm(a.id);box.appendChild(d)})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function loadForm(id){const a=state.articles.find(x=>x.id===id);if(!a)return;$('articleId').value=a.id;$('title').value=a.title||'';$('category').value=a.category||'CULTURE';$('excerpt').value=a.excerpt||'';$('author').value=a.author||'OKAY, BUT WHY? JOURNAL';$('date').value=a.date||'';$('image').value=a.image||'';$('keywords').value=(a.keywords||[]).join(', ');$('content').value=(a.content||'').replace(/<[^>]+>/g,'');$('editor').scrollIntoView({behavior:'smooth'})}
+function blank(){const id='art-'+Date.now();$('articleId').value=id;$('title').value='';$('category').value='CULTURE';$('excerpt').value='';$('author').value='OKAY, BUT WHY? JOURNAL';$('date').value=new Date().toLocaleDateString('en-US',{month:'long',day:'2-digit',year:'numeric'}).toUpperCase();$('image').value='';$('keywords').value='';$('content').value='';$('editor').style.display='block';$('title').focus()}
+$('connect').onclick=async()=>{try{msg('Connecting...');const d=await gh(cfg().path);state.sha=d.sha;const src=decode(d.content);state.articles=parseArticles(src);$('editor').style.display='block';$('articlesBox').style.display='block';renderList();msg('Connected. '+state.articles.length+' articles loaded.',true)}catch(e){msg('Connection failed:\n'+e.message)}};
+$('newPost').onclick=blank;
+$('clear').onclick=()=>{sessionStorage.clear();location.reload()};
+$('publish').onclick=async()=>{try{const id=$('articleId').value||('art-'+Date.now());const data={id,title:$('title').value.trim(),category:$('category').value,excerpt:$('excerpt').value.trim(),content:$('content').value.trim(),image:$('image').value.trim(),author:$('author').value.trim(),date:$('date').value.trim(),isHero:false,isEditorPick:false,keywords:$('keywords').value.split(',').map(x=>x.trim()).filter(Boolean)};if(!data.title||!data.content)throw Error('Title and article body are required.');const i=state.articles.findIndex(a=>a.id===id);if(i>=0)state.articles[i]=data;else state.articles.unshift(data);const d=await gh(cfg().path);const src=decode(d.content);const updated=replaceArticles(src,state.articles);const c=cfg();const body={message:(i>=0?'Edit':'Publish')+': '+data.title,content:encode(updated),sha:d.sha,branch:c.branch};const r=await fetch('https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+c.path,{method:'PUT',headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw Error((await r.text()).slice(0,800));state.sha=(await r.json()).content.sha;renderList();msg('Published successfully. GitHub Pages will rebuild the public website automatically.',true)}catch(e){msg('Publish failed:\n'+e.message)}};
+$('delete').onclick=async()=>{const id=$('articleId').value;if(!id)return;if(!confirm('Delete this article? This will publish the deletion.'))return;try{state.articles=state.articles.filter(a=>a.id!==id);const d=await gh(cfg().path);const updated=replaceArticles(decode(d.content),state.articles);const c=cfg();const r=await fetch('https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+c.path,{method:'PUT',headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:JSON.stringify({message:'Delete article '+id,content:encode(updated),sha:d.sha,branch:c.branch})});if(!r.ok)throw Error((await r.text()).slice(0,800));renderList();blank();msg('Article deleted and change published.',true)}catch(e){msg('Delete failed:\n'+e.message)}};
+</script>
+</body></html>

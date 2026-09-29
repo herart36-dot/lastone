@@ -1,18 +1,5 @@
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME # Replace with your username and repo name
-  branch: main                               # Or master if your default branch is master
+  repo: herart36/my-awesome-blog
+  branch: main
   base_url: https://sveltia-cms-auth.herart36.workers.dev
-
-media_folder: "images/uploads"
-public_folder: "/images/uploads"
-
-collections:
-  - name: "blog"
-    label: "Blog Posts"
-    folder: "posts"
-    create: true
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Publish Date", name: "date", widget: "datetime" }
-      - { label: "Body", name: "body", widget: "markdown" }

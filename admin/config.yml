@@ -1,18 +1,1 @@
-backend:
-  name: github
-  repo: herart36/lastone
-  branch: main
-  base_url: https://sveltia-cms-auth.herart36.workers.dev
 
-media_folder: "images/uploads"
-public_folder: "/images/uploads"
-
-collections:
-  - name: "posts"
-    label: "Posts"
-    folder: "posts"
-    create: true
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Publish Date", name: "date", widget: "datetime" }
-      - { label: "Body", name: "body", widget: "markdown" }

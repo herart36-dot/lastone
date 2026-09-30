@@ -440,7 +440,7 @@
         <div class="brand-header-container py-3 sm:py-5 text-center px-4 bg-editorial-cream/40 relative">
             <div class="max-w-7xl mx-auto flex flex-col items-center">
                 <div class="group cursor-pointer select-none inline-block relative">
-                    <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-none flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-3 transition-all duration-300">
+                    <h1 class="obw-logo font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-none flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-3 transition-all duration-300">
                         <span class="text-editorial-black group-hover:text-editorial-pink transition-colors">OKAY,</span>
                         <span class="text-editorial-pink italic font-brand relative inline-block group-hover:scale-105 transition-transform duration-300">
                             <span>BUT WHY?</span>
@@ -672,7 +672,7 @@
     <footer class="bg-editorial-black text-white border-t-3 border-editorial-border mt-16 py-12 px-4">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="space-y-3 md:col-span-2">
-                <h3 class="font-display text-xl font-extrabold tracking-wider uppercase flex items-center gap-2">
+                <h3 class="obw-logo obw-logo-footer font-display text-xl font-extrabold tracking-wider uppercase flex items-center gap-2">
                     OKAY, <span class="text-editorial-pink italic font-brand">BUT WHY?</span>
                 </h3>
                 <p class="text-xs text-gray-400 max-w-md font-sans">
@@ -2040,6 +2040,10 @@
         html body #reader-body > p:first-of-type, html body #reader-body > .rb > p:first-of-type { display:flow-root; }
         html body #reader-body > p:first-of-type::first-letter, html body #reader-body > .rb > p:first-of-type::first-letter { float:left; font-family:'Bodoni Moda','Didot',Georgia,serif; font-weight:900; font-size:4.9rem; line-height:.8; padding:.3rem .65rem 0 0; color:#FF0055; }
         @media (max-width:639px){ html body #reader-body > p:first-of-type::first-letter, html body #reader-body > .rb > p:first-of-type::first-letter { font-size:4.1rem; } }
+        /* RESTORED: original logo fonts (Syne + Playfair Display italic) in header and footer */
+        html body .obw-logo { font-family:'Syne',sans-serif !important; text-transform:uppercase !important; font-weight:800 !important; letter-spacing:-.025em !important; line-height:1 !important; }
+        html body .obw-logo.obw-logo-footer { letter-spacing:.05em !important; line-height:1.5 !important; }
+        html body .obw-logo .font-brand { font-family:'Playfair Display',serif !important; }
     </style>
 </body>
 </html>
